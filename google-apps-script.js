@@ -154,16 +154,37 @@ function getCapacity() {
   if (!capacitySheet) {
     capacitySheet = ss.insertSheet('Capacity');
     capacitySheet.appendRow(['Time Slot', 'Booked']);
-    capacitySheet.appendRow(['6:00 PM', 0]);
-    capacitySheet.appendRow(['6:15 PM', 0]);
-    capacitySheet.appendRow(['6:30 PM', 0]);
+    
+    // Add time slots with text formatting to prevent date conversion
+    const timeSlots = [
+      ['6:00 PM', 0],
+      ['6:15 PM', 0],
+      ['6:30 PM', 0]
+    ];
+    
+    timeSlots.forEach((slot, index) => {
+      capacitySheet.getRange(index + 2, 1).setNumberFormat('@STRING@'); // Force text format
+      capacitySheet.getRange(index + 2, 1).setValue(slot[0]);
+      capacitySheet.getRange(index + 2, 2).setValue(slot[1]);
+    });
   }
   
   const data = capacitySheet.getDataRange().getValues();
   const capacity = {};
   
   for (let i = 1; i < data.length; i++) {
-    capacity[data[i][0]] = {
+    // Convert date objects to time string if needed
+    let timeSlot = data[i][0];
+    if (timeSlot instanceof Date) {
+      const hours = timeSlot.getHours();
+      const mins = timeSlot.getMinutes();
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      const displayHours = hours % 12 || 12;
+      const displayMins = mins.toString().padStart(2, '0');
+      timeSlot = `${displayHours}:${displayMins} ${ampm}`;
+    }
+    
+    capacity[timeSlot] = {
       capacity: 20,
       booked: parseInt(data[i][1]) || 0
     };
@@ -174,26 +195,81 @@ function getCapacity() {
 
 // Update capacity when a VIP reservation is made
 function updateCapacity(timeSlot, guestCount) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  let capacitySheet = ss.getSheetByName('Capacity');
-  
-  if (!capacitySheet) {
-    capacitySheet = ss.insertSheet('Capacity');
-    capacitySheet.appendRow(['Time Slot', 'Booked']);
-    capacitySheet.appendRow(['6:00 PM', 0]);
-    capacitySheet.appendRow(['6:15 PM', 0]);
-    capacitySheet.appendRow(['6:30 PM', 0]);
-  }
-  
-  const data = capacitySheet.getDataRange().getValues();
-  
-  for (let i = 1; i < data.length; i++) {
-    if (data[i][0] === timeSlot) {
-      const currentBooked = parseInt(data[i][1]) || 0;
-      capacitySheet.getRange(i + 1, 2).setValue(currentBooked + guestCount);
-      Logger.log('Updated capacity for ' + timeSlot + ': ' + (currentBooked + guestCount));
-      break;
+  try {
+    Logger.log('updateCapacity called with timeSlot: ' + timeSlot + ', guestCount: ' + guestCount);
+    
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let capacitySheet = ss.getSheetByName('Capacity');
+    
+    if (!capacitySheet) {
+      Logger.log('Capacity sheet not found, creating new one');
+      capacitySheet = ss.insertSheet('Capacity');
+      capacitySheet.appendRow(['Time Slot', 'Booked']);
+      
+      // Add time slots with text formatting
+      const timeSlots = [
+        ['6:00 PM', 0],
+        ['6:15 PM', 0],
+        ['6:30 PM', 0]
+      ];
+      
+      timeSlots.forEach((slot, index) => {
+        capacitySheet.getRange(index + 2, 1).setNumberFormat('@STRING@');
+        capacitySheet.getRange(index + 2, 1).setValue(slot[0]);
+        capacitySheet.getRange(index + 2, 2).setValue(slot[1]);
+      });
     }
+    
+    const data = capacitySheet.getDataRange().getValues();
+    Logger.log('Capacity sheet data: ' + JSON.stringify(data));
+    
+    let found = false;
+    for (let i = 1; i < data.length; i++) {
+      // Convert date object to time string if needed for comparison
+      let cellTimeSlot = data[i][0];
+      if (cellTimeSlot instanceof Date) {
+        const hours = cellTimeSlot.getHours();
+        const mins = cellTimeSlot.getMinutes();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const displayHours = hours % 12 || 12;
+        const displayMins = mins === 0 ? '00' : mins.toString().padStart(2, '0');
+        cellTimeSlot = `${displayHours}:${displayMins} ${ampm}`;
+      }
+      
+      Logger.log('Checking row ' + i + ': "' + cellTimeSlot + '" vs "' + timeSlot + '"');
+      
+      if (cellTimeSlot === timeSlot) {
+        const currentBooked = parseInt(data[i][1]) || 0;
+        const newTotal = currentBooked + guestCount;
+        capacitySheet.getRange(i + 1, 2).setValue(newTotal);
+        
+        Logger.log('✓ Updated capacity for ' + timeSlot + ': ' + currentBooked + ' + ' + guestCount + ' = ' + newTotal);
+        found = true;
+        break;
+      }
+    }
+    
+    if (!found) {
+      Logger.log('⚠️ WARNING: Time slot "' + timeSlot + '" not found in Capacity sheet');
+      Logger.log('Available slots: ' + JSON.stringify(data.slice(1).map(row => {
+        let slot = row[0];
+        if (slot instanceof Date) {
+          const hours = slot.getHours();
+          const mins = slot.getMinutes();
+          const ampm = hours >= 12 ? 'PM' : 'AM';
+          const displayHours = hours % 12 || 12;
+          const displayMins = mins === 0 ? '00' : mins.toString().padStart(2, '0');
+          slot = `${displayHours}:${displayMins} ${ampm}`;
+        }
+        return slot;
+      })));
+    }
+    
+    // Force save
+    SpreadsheetApp.flush();
+    
+  } catch (error) {
+    Logger.log('❌ Error in updateCapacity: ' + error.toString());
   }
 }
 
@@ -326,4 +402,18 @@ function testSetup() {
   Logger.log('Current Capacity: ' + JSON.stringify(capacity));
   
   Logger.log('Setup test complete!');
+}
+
+// Test capacity update function
+function testCapacityUpdate() {
+  Logger.log('=== Testing Capacity Update ===');
+  
+  // Test updating 6:00 PM slot with 2 guests
+  updateCapacity('6:00 PM', 2);
+  
+  Logger.log('Test complete. Check the Capacity sheet to see if the value increased.');
+  
+  // Show current capacity
+  const capacity = getCapacity();
+  Logger.log('Current capacity after test: ' + JSON.stringify(capacity));
 }

@@ -1,7 +1,7 @@
 // Configuration - Replace these with your actual values
 const CONFIG = {
-    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbw9We4ozZkFB3YoqDOUZJhLMpcZm7JcobClrinXpC7z4tqPTqGlP2O5kpvCUHhYwoE_/exec',
-    EMAIL_SERVICE_URL: 'https://script.google.com/macros/s/AKfycbw9We4ozZkFB3YoqDOUZJhLMpcZm7JcobClrinXpC7z4tqPTqGlP2O5kpvCUHhYwoE_/exec' // Can use same Google Apps Script or separate service
+    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxdz_zh7e57sZ0sMayu1YSRzEllMSrmpA7eKwme5N0S1PZXn41_6hJWsgmiMx3KdGYb/exec',
+    EMAIL_SERVICE_URL: 'https://script.google.com/macros/s/AKfycbxdz_zh7e57sZ0sMayu1YSRzEllMSrmpA7eKwme5N0S1PZXn41_6hJWsgmiMx3KdGYb/exec' // Can use same Google Apps Script or separate service
 };
 
 // Event Details
