@@ -10,17 +10,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Logo at top on pink background -->
+    <div class="logo">
+        <img src="logo.png" alt="Lobby Hamilton Logo">
+    </div>
+
     <div class="container">
         <!-- Event Details Section -->
         <section class="event-section">
-            <div class="logo">
-                <h1>LOBBY HAMILTON</h1>
-            </div>
-            
             <div class="event-details">
                 <h2>You're Invited</h2>
-                <h3>Ladies Night Launch Event</h3>
-                <p class="event-subtitle">Late Night Mingle & Networking</p>
+                <h3>Ladies Night Launch</h3>
+                <p class="event-subtitle social-badge">Late Night Mingle & Networking</p>
                 
                 <div class="event-info">
                     <div class="info-item">
@@ -37,17 +38,49 @@
                     </div>
                 </div>
                 
-                <p class="event-description">
-                    Join us for an exclusive evening to celebrate the launch of Ladies Night at Lobby Hamilton. 
-                    Connect with fellow influencers, enjoy curated cocktails, and be part of something special.
-                </p>
+                <!-- <p class="event-description">
+                    Join us for an unforgettable evening celebrating the launch of Ladies Night at Lobby Hamilton. 
+                    Connect with inspiring women, enjoy signature cocktails, and experience an atmosphere designed 
+                    exclusively for you. This is more than an event—it's a celebration of community, style, and empowerment.
+                </p> -->
+
+                <div class="launch-announcement">
+                    <p><strong>✨ Introducing Ladies Night at Lobby Hamilton ✨</strong></p>
+                    <p>Starting December 17th, join us every Wednesday for an unforgettable evening designed exclusively for women. This launch event on December 10th is your first taste of what's to come!</p>
+                </div>
+
+                <div class="inclusions">
+                    <h4>What's Included</h4>
+                    <div class="inclusions-grid">
+                        <div class="inclusion-item">
+                            <span class="icon">🍸</span>
+                            <p>One Classic Cocktail</p>
+                        </div>
+                        <div class="inclusion-item">
+                            <span class="icon">🥂</span>
+                            <p>Passed Canapés</p>
+                        </div>
+                        <div class="inclusion-item">
+                            <span class="icon">🎵</span>
+                            <p>Live Entertainment</p>
+                        </div>
+                        <div class="inclusion-item">
+                            <span class="icon">💿</span>
+                            <p>DJ GIGI</p>
+                        </div>
+                        <div class="inclusion-item">
+                            <span class="icon">✨</span>
+                            <p>Network with Top Influencers</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
         <!-- RSVP Form Section -->
         <section class="rsvp-section">
-            <h2>RSVP</h2>
-            <p class="rsvp-subtitle">Secure your spot for this exclusive event</p>
+            <h2>Save Your Spot</h2>
+            <p class="rsvp-subtitle">We can't wait to celebrate with you</p>
             
             <form id="rsvpForm" class="rsvp-form">
                 <div class="form-group">
@@ -87,8 +120,8 @@
 
             <!-- Success Message -->
             <div id="successMessage" class="success-message" style="display: none;">
-                <h3>✓ RSVP Confirmed!</h3>
-                <p>Thank you for confirming your attendance. A confirmation email has been sent to your inbox.</p>
+                <h3>✨ You're on the List!</h3>
+                <p>Thank you for confirming! We're thrilled you'll be joining us. A confirmation email is on its way to your inbox.</p>
                 <div class="calendar-buttons">
                     <p>Add to your calendar:</p>
                     <button id="addToApple" class="calendar-btn apple-btn">
@@ -114,6 +147,13 @@
     <footer>
         <p>&copy; 2025 Lobby Hamilton. All rights reserved.</p>
     </footer>
+
+    <!-- Bottom CTA Banner -->
+    <div class="bottom-banner" id="bottomBanner">
+        <div class="bottom-banner-content">
+            Reserve Your Spot Now <span>↓</span>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

@@ -10,17 +10,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Logo at top on pink background -->
+    <div class="logo">
+        <img src="logo.png" alt="Lobby Hamilton Logo">
+    </div>
+
     <div class="container">
         <!-- Event Details Section -->
         <section class="event-section">
-            <div class="logo">
-                <h1>LOBBY HAMILTON</h1>
-            </div>
-            
             <div class="event-details">
                 <h2>You're Invited</h2>
-                <h3>Ladies Night Launch Event</h3>
-                <p class="event-subtitle vip-badge">VIP Exclusive: Dinner + Late Night Social</p>
+                <h3>Ladies Night Launch</h3>
+                <p class="event-subtitle vip-badge">VIP Experience: Dinner & Celebration</p>
                 
                 <div class="event-info">
                     <div class="info-item">
@@ -41,18 +42,57 @@
                     </div>
                 </div>
                 
-                <p class="event-description">
-                    You've been selected for an exclusive VIP experience. Join us for an intimate dinner service 
-                    followed by the official Ladies Night launch celebration. Enjoy curated cuisine, signature cocktails, 
-                    and connect with an elite group of influencers and tastemakers.
-                </p>
+                <!-- <p class="event-description">
+                    You've been chosen for an exclusive VIP experience. Begin your evening with an intimate dinner 
+                    featuring exquisite cuisine, followed by the official Ladies Night celebration. This is a night 
+                    designed for connection, elegance, and creating unforgettable moments with an exceptional group 
+                    of inspiring women.
+                </p> -->
+
+                <div class="launch-announcement">
+                    <p><strong>✨ Introducing Ladies Night at Lobby Hamilton ✨</strong></p>
+                    <p>Starting December 17th, join us every Wednesday for an unforgettable evening designed exclusively for women. This launch event on December 10th is your first taste of what's to come!</p>
+                </div>
+
+                <div class="inclusions">
+                    <h4>Your VIP Experience Includes</h4>
+                    <div class="inclusions-grid">
+                        <div class="inclusion-item vip-exclusive">
+                            <span class="vip-tag">VIP</span>
+                            <span class="icon">🍽️</span>
+                            <p>One Shareable per Person</p>
+                        </div>
+                        <div class="inclusion-item vip-exclusive">
+                            <span class="vip-tag">VIP</span>
+                            <span class="icon">🌹</span>
+                            <p>One Glass of Rosé</p>
+                        </div>
+                        <div class="inclusion-item vip-exclusive">
+                            <span class="vip-tag">VIP</span>
+                            <span class="icon">🍸</span>
+                            <p>One Classic Cocktail</p>
+                        </div>
+                        <div class="inclusion-item">
+                            <span class="icon">🎵</span>
+                            <p>Live Entertainment</p>
+                        </div>
+                        <div class="inclusion-item">
+                            <span class="icon">💿</span>
+                            <p>DJ GIGI</p>
+                        </div>
+                        <div class="inclusion-item">
+                            <span class="icon">✨</span>
+                            <p>Network with Top Influencers</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
         <!-- RSVP Form Section -->
         <section class="rsvp-section">
-            <h2>RSVP</h2>
-            <p class="rsvp-subtitle">Secure your spot for this exclusive VIP event</p>
+            <h2>Reserve Your Experience</h2>
+            <p class="rsvp-subtitle">Confirm your VIP reservation for this exclusive evening</p>
             
             <form id="rsvpForm" class="rsvp-form">
                 <div class="form-group">
@@ -108,8 +148,8 @@
 
             <!-- Success Message -->
             <div id="successMessage" class="success-message" style="display: none;">
-                <h3>✓ RSVP Confirmed!</h3>
-                <p>Thank you for confirming your attendance. A confirmation email with your dinner reservation details has been sent to your inbox.</p>
+                <h3>✨ Your VIP Reservation is Confirmed!</h3>
+                <p>We're honored you'll be joining us for this exclusive experience. Your confirmation email with all the details is on its way.</p>
                 <div class="reservation-details" id="reservationDetails"></div>
                 <div class="calendar-buttons">
                     <p>Add to your calendar:</p>
@@ -136,6 +176,13 @@
     <footer>
         <p>&copy; 2025 Lobby Hamilton. All rights reserved.</p>
     </footer>
+
+    <!-- Bottom CTA Banner -->
+    <div class="bottom-banner" id="bottomBanner">
+        <div class="bottom-banner-content">
+            Reserve Your VIP Spot <span>↓</span>
+        </div>
+    </div>
 
     <script src="vip-script.js"></script>
 </body>

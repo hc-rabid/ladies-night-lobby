@@ -233,7 +233,8 @@ function sendConfirmationEmail(data, sheetType) {
     
     GmailApp.sendEmail(data.email, subject, '', {
       htmlBody: htmlBody,
-      name: 'Lobby Hamilton'
+      name: 'Lobby Hamilton - Ladies Night',
+      replyTo: 'noreply@example.com'
     });
     
     Logger.log('Confirmation email sent to: ' + data.email);
