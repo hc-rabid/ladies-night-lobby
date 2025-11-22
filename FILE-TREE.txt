@@ -1,0 +1,268 @@
+ladies-night-lobby/
+│
+├── 🌐 WEBSITE FILES (Deploy These)
+│   ├── index.html                  Main late night mingle invitation page
+│   ├── vip.html                    Hidden VIP dinner invitation page  
+│   ├── styles.css                  Shared stylesheet for both pages
+│   ├── script.js                   Late night page functionality
+│   └── vip-script.js               VIP page with capacity tracking
+│
+├── ⚙️ BACKEND CODE (Copy to Google Apps Script)
+│   └── google-apps-script.js       Backend for Google Sheets integration
+│
+├── 📚 DOCUMENTATION (Reference & Setup)
+│   ├── PROJECT-SUMMARY.md          🎯 START HERE - Complete overview
+│   ├── SETUP-GUIDE.md              📋 Step-by-step setup instructions
+│   ├── README.md                   📖 Comprehensive documentation
+│   ├── TESTING-CHECKLIST.md        ✅ Pre-launch testing checklist
+│   ├── QUICK-REFERENCE.md          ⚡ Quick reference for event day
+│   └── STRUCTURE.md                🏗️ Visual project structure
+│
+└── 🔧 CONFIGURATION
+    └── .gitignore                  Version control configuration
+
+═══════════════════════════════════════════════════════════════
+
+📊 GOOGLE SHEETS STRUCTURE (Create Manually)
+
+Spreadsheet: "Ladies Night RSVPs - Lobby Hamilton"
+│
+├── Tab 1: LateNightRSVPs
+│   └── Columns: Timestamp | Name | Email | Phone | Guests | Event Type
+│
+├── Tab 2: VIPRSVPs
+│   └── Columns: Timestamp | Name | Email | Phone | Guests | Dinner Time | Notes | Event Type
+│
+└── Tab 3: Capacity
+    └── Columns: Time Slot | Booked
+        ├── 6:00 PM | 0
+        ├── 6:15 PM | 0
+        └── 6:30 PM | 0
+
+═══════════════════════════════════════════════════════════════
+
+🔗 URL STRUCTURE (After Deployment)
+
+Production Website:
+├── https://yourdomain.com/                → Late Night Mingle (Public)
+├── https://yourdomain.com/index.html      → Late Night Mingle (Public)
+└── https://yourdomain.com/vip.html        → VIP Dinner (Hidden)
+
+═══════════════════════════════════════════════════════════════
+
+⚡ QUICK START GUIDE
+
+1. READ FIRST
+   └── PROJECT-SUMMARY.md (this gives you the complete overview)
+
+2. SETUP (40 minutes total)
+   └── Follow SETUP-GUIDE.md step by step
+
+3. TEST
+   └── Use TESTING-CHECKLIST.md before going live
+
+4. LAUNCH
+   └── Share your links and use QUICK-REFERENCE.md during event
+
+═══════════════════════════════════════════════════════════════
+
+📝 FILE SIZES (Approximate)
+
+Website Files: ~50 KB total
+├── index.html: ~5 KB
+├── vip.html: ~6 KB
+├── styles.css: ~10 KB
+├── script.js: ~10 KB
+└── vip-script.js: ~12 KB
+
+Documentation: ~100 KB total
+
+Total Project: ~150 KB
+
+═══════════════════════════════════════════════════════════════
+
+🎯 WHAT EACH FILE DOES
+
+HTML FILES:
+├── index.html
+│   ├── Displays event information for late night mingle
+│   ├── Shows RSVP form (name, email, phone, guests)
+│   ├── Handles success message
+│   └── Provides calendar download buttons
+│
+└── vip.html
+    ├── Displays VIP event information with special badge
+    ├── Shows extended form with dinner time selection
+    ├── Includes notes/dietary restrictions field
+    ├── Displays time-specific reservation details
+    └── Provides time-specific calendar downloads
+
+CSS FILE:
+└── styles.css
+    ├── Defines color scheme and typography
+    ├── Styles event details sections
+    ├── Styles RSVP forms and buttons
+    ├── Handles responsive design for mobile
+    ├── Animates success messages
+    └── Provides error state styling
+
+JAVASCRIPT FILES:
+├── script.js
+│   ├── Handles form validation
+│   ├── Submits data to Google Sheets
+│   ├── Sends confirmation emails
+│   ├── Generates calendar files
+│   ├── Formats phone numbers
+│   └── Manages UI states (loading, success, error)
+│
+└── vip-script.js
+    ├── All features from script.js PLUS:
+    ├── Loads current capacity from Google Sheets
+    ├── Updates time slot availability dynamically
+    ├── Tracks capacity limits (20 per slot)
+    ├── Prevents overbooking
+    ├── Generates time-specific calendar entries
+    └── Includes dinner details in confirmations
+
+BACKEND FILE:
+└── google-apps-script.js
+    ├── Receives form submissions (doPost)
+    ├── Writes data to appropriate Google Sheet
+    ├── Tracks and updates capacity
+    ├── Sends email confirmations
+    ├── Provides capacity data (doGet)
+    └── Handles errors gracefully
+
+DOCUMENTATION FILES:
+├── PROJECT-SUMMARY.md      Complete project overview and launch guide
+├── SETUP-GUIDE.md          Detailed step-by-step setup instructions
+├── README.md               Technical documentation and troubleshooting
+├── TESTING-CHECKLIST.md    Pre-launch testing procedures
+├── QUICK-REFERENCE.md      Event-day quick reference card
+└── STRUCTURE.md            Visual documentation of architecture
+
+═══════════════════════════════════════════════════════════════
+
+🔄 DATA FLOW
+
+User visits page
+    ↓
+Fills out form
+    ↓
+JavaScript validates input
+    ↓
+Submits to Google Apps Script
+    ↓
+    ├─→ Writes to Google Sheet (LateNightRSVPs or VIPRSVPs)
+    │
+    ├─→ Updates Capacity (VIP only)
+    │
+    └─→ Sends confirmation email
+        ↓
+User sees success message
+    ↓
+Can download calendar event
+
+═══════════════════════════════════════════════════════════════
+
+✅ DEPLOYMENT CHECKLIST
+
+□ Upload 5 website files to hosting:
+  □ index.html
+  □ vip.html
+  □ styles.css
+  □ script.js
+  □ vip-script.js
+
+□ Copy google-apps-script.js to Google Apps Script
+
+□ Update CONFIG URLs in:
+  □ script.js (lines 2-5)
+  □ vip-script.js (lines 2-5)
+
+□ Test both pages thoroughly
+
+□ Share links with guests
+
+═══════════════════════════════════════════════════════════════
+
+🎨 CUSTOMIZATION QUICK REFERENCE
+
+To Change          Edit This                Line Numbers
+─────────────────  ──────────────────────  ─────────────
+Event Date         script.js               10
+                   vip-script.js           10
+                   Both HTML files         Search "December 10"
+
+Event Time         script.js               11-12
+                   vip-script.js           11-14
+                   Both HTML files         Search "8:00 PM"
+
+Colors             styles.css              10-18
+
+Logo/Branding      index.html              26
+                   vip.html                26
+
+Location           Both HTML files         Search "Lobby Hamilton"
+                   script.js               13
+                   vip-script.js           15
+
+═══════════════════════════════════════════════════════════════
+
+🎯 KEY FEATURES BY PAGE
+
+Late Night Page:
+✓ Public access
+✓ Basic RSVP form
+✓ Google Sheets integration
+✓ Email confirmations
+✓ Calendar downloads
+✓ Mobile responsive
+
+VIP Page:
+✓ Hidden URL access
+✓ Extended RSVP form
+✓ Dinner time selection
+✓ Capacity tracking (20/slot)
+✓ Notes field
+✓ Separate Google Sheet
+✓ Time-specific calendars
+✓ Enhanced confirmations
+
+═══════════════════════════════════════════════════════════════
+
+📊 CAPACITY MANAGEMENT
+
+Time Slots:        Max Guests:
+├── 6:00 PM       20 guests
+├── 6:15 PM       20 guests
+└── 6:30 PM       20 guests
+
+Total VIP Capacity: 60 guests
+
+Features:
+├── Real-time tracking
+├── Automatic updates
+├── Dynamic availability display
+├── Prevents overbooking
+└── Removes full slots from dropdown
+
+═══════════════════════════════════════════════════════════════
+
+💾 BACKUP RECOMMENDATIONS
+
+Before Event:
+├── Export Google Sheets to Excel
+├── Save email list separately
+├── Screenshot capacity tracker
+└── Test all functionality
+
+After Event:
+├── Archive all data
+├── Save final guest count
+├── Document attendance rate
+└── Keep for future reference
+
+═══════════════════════════════════════════════════════════════
+
+Ready to launch? Start with PROJECT-SUMMARY.md! 🚀
