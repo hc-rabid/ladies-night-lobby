@@ -81,14 +81,32 @@ function doPost(e) {
   }
 }
 
-// Handle GET requests (capacity check)
+// Handle GET requests (capacity check and data fetching)
 function doGet(e) {
   try {
-    if (e.parameter.action === 'getCapacity') {
+    const action = e.parameter.action;
+    
+    if (action === 'getCapacity') {
       const capacity = getCapacity();
       return ContentService.createTextOutput(JSON.stringify({
         status: 'success',
         capacity: capacity
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    if (action === 'getVIPRSVPs') {
+      const data = getRSVPData('VIPRSVPs');
+      return ContentService.createTextOutput(JSON.stringify({
+        status: 'success',
+        data: data
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    if (action === 'getSocialRSVPs') {
+      const data = getRSVPData('LateNightRSVPs');
+      return ContentService.createTextOutput(JSON.stringify({
+        status: 'success',
+        data: data
       })).setMimeType(ContentService.MimeType.JSON);
     }
     
@@ -97,6 +115,34 @@ function doGet(e) {
     Logger.log('Error in doGet: ' + error.toString());
     return createResponse('error', error.toString());
   }
+}
+
+// Get RSVP data from a specific sheet
+function getRSVPData(sheetName) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(sheetName);
+  
+  if (!sheet) {
+    return [];
+  }
+  
+  const data = sheet.getDataRange().getValues();
+  
+  if (data.length <= 1) {
+    return []; // No data (only headers)
+  }
+  
+  const headers = data[0];
+  const rows = data.slice(1);
+  
+  // Convert to array of objects
+  return rows.map(row => {
+    const obj = {};
+    headers.forEach((header, index) => {
+      obj[header.toLowerCase().replace(/\s+/g, '')] = row[index];
+    });
+    return obj;
+  });
 }
 
 // Get current capacity for all time slots
