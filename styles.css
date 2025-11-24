@@ -256,6 +256,33 @@ h1, h2, h3 {
     line-height: 1.4;
 }
 
+/* VIP Offerings Group */
+.vip-offerings-group {
+    background: linear-gradient(135deg, #fffbf5, #fff8ed);
+    border: 3px solid #d4af37;
+    border-radius: 16px;
+    padding: 25px 20px 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.25);
+    position: relative;
+}
+
+.vip-group-header {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #d4af37, #f4d03f);
+    color: #2c2c2c;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 6px 20px;
+    border-radius: 20px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    box-shadow: 0 3px 10px rgba(212, 175, 55, 0.4);
+}
+
 /* VIP Exclusive Items */
 .vip-exclusive {
     position: relative;
