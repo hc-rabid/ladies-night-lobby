@@ -16,13 +16,6 @@ const EVENT_DETAILS = {
     description: 'An unforgettable evening designed exclusively for women at Lobby Hamilton.'
 };
 
-// Time slot capacity tracking
-const TIME_SLOTS = {
-    '6:00 PM': { capacity: 20, booked: 0 },
-    '6:15 PM': { capacity: 20, booked: 0 },
-    '6:30 PM': { capacity: 20, booked: 0 }
-};
-
 // DOM Elements
 const form = document.getElementById('rsvpForm');
 const submitBtn = document.getElementById('submitBtn');
@@ -34,29 +27,7 @@ const addToGoogleBtn = document.getElementById('addToGoogle');
 const eventTypeSelect = document.getElementById('eventType');
 const dinnerTimeSelect = document.getElementById('dinnerTime');
 const dinnerTimeGroup = document.getElementById('dinnerTimeGroup');
-const capacityInfo = document.getElementById('capacityInfo');
 const reservationDetails = document.getElementById('reservationDetails');
-
-// Initialize - Load capacity data
-async function initializeCapacity() {
-    try {
-        // Fetch current capacity from Google Sheets
-        const response = await fetch(`${CONFIG.GOOGLE_APPS_SCRIPT_URL}?action=getCapacity`, {
-            method: 'GET'
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            if (data.capacity) {
-                Object.assign(TIME_SLOTS, data.capacity);
-                updateTimeSlotOptions();
-            }
-        }
-    } catch (error) {
-        console.error('Error loading capacity:', error);
-        // Continue with default capacity values
-    }
-}
 
 // Handle event type selection
 eventTypeSelect.addEventListener('change', (e) => {
@@ -71,27 +42,6 @@ eventTypeSelect.addEventListener('change', (e) => {
         dinnerTimeSelect.value = '';
     }
 });
-
-// Update time slot options based on capacity
-function updateTimeSlotOptions() {
-    const options = dinnerTimeSelect.querySelectorAll('option[value]');
-    
-    options.forEach(option => {
-        if (option.value) {
-            const slot = TIME_SLOTS[option.value];
-            const remaining = slot.capacity - slot.booked;
-            
-            if (remaining <= 0) {
-                option.disabled = true;
-                option.textContent = `${option.value} - FULL`;
-            } else if (remaining <= 5) {
-                option.textContent = `${option.value} - Only ${remaining} spots left`;
-            } else {
-                option.textContent = `${option.value} - ${remaining} spots available`;
-            }
-        }
-    });
-}
 
 // Form submission handler
 form.addEventListener('submit', async (e) => {
@@ -115,30 +65,12 @@ form.addEventListener('submit', async (e) => {
         return;
     }
 
-    // Check capacity before submission (only for dinner + social)
-    if (formData.eventType === 'dinner-social' && formData.dinnerTime !== 'N/A') {
-        const slot = TIME_SLOTS[formData.dinnerTime];
-        const guestCount = parseInt(formData.guests);
-        
-        if (slot.booked + guestCount > slot.capacity) {
-            showError(`Sorry, only ${slot.capacity - slot.booked} spots remain for this time slot. Please select a different time.`);
-            return;
-        }
-    }
-
     // Show loading state
     setLoading(true);
 
     try {
         // Submit to Google Sheets
         await submitToGoogleSheets(formData);
-        
-        // Update local capacity (only for dinner reservations)
-        if (formData.eventType === 'dinner-social' && formData.dinnerTime !== 'N/A') {
-            const guestCount = parseInt(formData.guests);
-            TIME_SLOTS[formData.dinnerTime].booked += guestCount;
-            updateTimeSlotOptions();
-        }
         
         // Show success message
         showSuccess(formData);
@@ -471,7 +403,7 @@ document.getElementById('phone').addEventListener('input', (e) => {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-    initializeCapacity();
+    // Page initialization complete
 });
 
 // Bottom banner click handler
