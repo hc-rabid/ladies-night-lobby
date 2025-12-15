@@ -6,14 +6,14 @@ const CONFIG = {
 
 // Event Details
 const EVENT_DETAILS = {
-    name: 'Ladies Night Launch - VIP Dinner + Social',
-    date: 'December 10, 2025',
+    name: 'Ladies Night at Lobby Hamilton',
+    date: 'December 17, 2025',
     dinnerStart: '6:00 PM',
     dinnerEnd: '8:00 PM',
     socialStart: '8:00 PM',
     socialEnd: '12:00 AM',
     location: 'Lobby Hamilton, Hamilton, ON',
-    description: 'Exclusive VIP dinner service followed by the Ladies Night launch celebration at Lobby Hamilton.'
+    description: 'An unforgettable evening designed exclusively for women at Lobby Hamilton.'
 };
 
 // Time slot capacity tracking
@@ -31,7 +31,9 @@ const btnLoader = submitBtn.querySelector('.btn-loader');
 const successMessage = document.getElementById('successMessage');
 const addToAppleBtn = document.getElementById('addToApple');
 const addToGoogleBtn = document.getElementById('addToGoogle');
+const eventTypeSelect = document.getElementById('eventType');
 const dinnerTimeSelect = document.getElementById('dinnerTime');
+const dinnerTimeGroup = document.getElementById('dinnerTimeGroup');
 const capacityInfo = document.getElementById('capacityInfo');
 const reservationDetails = document.getElementById('reservationDetails');
 
@@ -56,6 +58,20 @@ async function initializeCapacity() {
     }
 }
 
+// Handle event type selection
+eventTypeSelect.addEventListener('change', (e) => {
+    const eventType = e.target.value;
+    
+    if (eventType === 'dinner-social') {
+        dinnerTimeGroup.style.display = 'block';
+        dinnerTimeSelect.required = true;
+    } else {
+        dinnerTimeGroup.style.display = 'none';
+        dinnerTimeSelect.required = false;
+        dinnerTimeSelect.value = '';
+    }
+});
+
 // Update time slot options based on capacity
 function updateTimeSlotOptions() {
     const options = dinnerTimeSelect.querySelectorAll('option[value]');
@@ -77,25 +93,6 @@ function updateTimeSlotOptions() {
     });
 }
 
-// Show capacity info when time slot is selected
-dinnerTimeSelect.addEventListener('change', (e) => {
-    const selectedTime = e.target.value;
-    if (selectedTime && TIME_SLOTS[selectedTime]) {
-        const slot = TIME_SLOTS[selectedTime];
-        const remaining = slot.capacity - slot.booked;
-        
-        if (remaining > 0) {
-            capacityInfo.textContent = `${remaining} of ${slot.capacity} spots remaining for this time slot`;
-            capacityInfo.classList.remove('capacity-full');
-        } else {
-            capacityInfo.textContent = 'This time slot is full. Please select another time.';
-            capacityInfo.classList.add('capacity-full');
-        }
-    } else {
-        capacityInfo.textContent = '';
-    }
-});
-
 // Form submission handler
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -107,9 +104,9 @@ form.addEventListener('submit', async (e) => {
         phone: document.getElementById('phone').value.trim(),
         instagram: document.getElementById('instagram').value.trim(),
         guests: document.getElementById('guests').value,
-        dinnerTime: document.getElementById('dinnerTime').value,
+        eventType: document.getElementById('eventType').value,
+        dinnerTime: document.getElementById('dinnerTime').value || 'N/A',
         notes: document.getElementById('notes').value.trim(),
-        eventType: 'VIP Dinner + Social',
         timestamp: new Date().toISOString()
     };
 
@@ -118,13 +115,15 @@ form.addEventListener('submit', async (e) => {
         return;
     }
 
-    // Check capacity before submission
-    const slot = TIME_SLOTS[formData.dinnerTime];
-    const guestCount = parseInt(formData.guests);
-    
-    if (slot.booked + guestCount > slot.capacity) {
-        showError(`Sorry, only ${slot.capacity - slot.booked} spots remain for this time slot. Please select a different time.`);
-        return;
+    // Check capacity before submission (only for dinner + social)
+    if (formData.eventType === 'dinner-social' && formData.dinnerTime !== 'N/A') {
+        const slot = TIME_SLOTS[formData.dinnerTime];
+        const guestCount = parseInt(formData.guests);
+        
+        if (slot.booked + guestCount > slot.capacity) {
+            showError(`Sorry, only ${slot.capacity - slot.booked} spots remain for this time slot. Please select a different time.`);
+            return;
+        }
     }
 
     // Show loading state
@@ -134,19 +133,19 @@ form.addEventListener('submit', async (e) => {
         // Submit to Google Sheets
         await submitToGoogleSheets(formData);
         
-        // Update local capacity
-        TIME_SLOTS[formData.dinnerTime].booked += guestCount;
-        updateTimeSlotOptions();
-        
-        // Send confirmation email
-        await sendConfirmationEmail(formData);
+        // Update local capacity (only for dinner reservations)
+        if (formData.eventType === 'dinner-social' && formData.dinnerTime !== 'N/A') {
+            const guestCount = parseInt(formData.guests);
+            TIME_SLOTS[formData.dinnerTime].booked += guestCount;
+            updateTimeSlotOptions();
+        }
         
         // Show success message
         showSuccess(formData);
         
         // Reset form
         form.reset();
-        capacityInfo.textContent = '';
+        dinnerTimeGroup.style.display = 'none';
     } catch (error) {
         console.error('Error submitting RSVP:', error);
         showError('There was an error submitting your RSVP. Please try again or contact us directly.');
@@ -197,8 +196,8 @@ function validateForm(data) {
     // Update the data with formatted Instagram
     data.instagram = instagram;
     
-    // Validate dinner time
-    if (!data.dinnerTime) {
+    // Validate dinner time (only if dinner-social selected)
+    if (data.eventType === 'dinner-social' && !data.dinnerTime) {
         showFieldError('dinnerTime', 'Please select a dinner time slot');
         isValid = false;
     }
@@ -215,7 +214,7 @@ async function submitToGoogleSheets(data) {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            sheet: 'VIPRSVPs',
+            sheet: 'SpecialGuestRSVPs',
             data: data
         })
     });
@@ -225,26 +224,30 @@ async function submitToGoogleSheets(data) {
 
 // Send confirmation email
 async function sendConfirmationEmail(data) {
+    const isDinner = data.eventType === 'dinner-social';
+    const eventTypeName = isDinner ? 'Dinner + Social' : 'Social Only';
+    
     const emailData = {
         to: data.email,
-        subject: 'VIP Reservation Confirmed - Ladies Night at Lobby Hamilton',
+        subject: 'Reservation Confirmed - Ladies Night at Lobby Hamilton',
         html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
                 <h1 style="color: #1a1a1a; border-bottom: 2px solid #d4af37; padding-bottom: 15px;">
                     LOBBY HAMILTON
                 </h1>
                 <div style="background: linear-gradient(135deg, #d4af37, #8b7355); color: white; padding: 15px; border-radius: 8px; text-align: center; margin: 20px 0;">
-                    <h2 style="margin: 0;">VIP RESERVATION CONFIRMED</h2>
+                    <h2 style="margin: 0;">RESERVATION CONFIRMED</h2>
                 </div>
                 <p>Dear ${data.name},</p>
-                <p>Thank you for confirming your attendance at our exclusive VIP Ladies Night Launch event. Your dinner reservation has been confirmed.</p>
+                <p>Thank you for confirming your attendance at Ladies Night this Wednesday! We're thrilled to have you as our special guest.</p>
                 
                 <div style="background: #f8f8f8; padding: 20px; margin: 20px 0; border-left: 4px solid #d4af37;">
                     <h3 style="margin-top: 0; color: #1a1a1a;">Your Reservation Details</h3>
                     <p><strong>Event:</strong> ${EVENT_DETAILS.name}</p>
                     <p><strong>Date:</strong> Wednesday, ${EVENT_DETAILS.date}</p>
-                    <p><strong>Dinner Seating Time:</strong> ${data.dinnerTime}</p>
-                    <p><strong>Dinner Service:</strong> ${EVENT_DETAILS.dinnerStart} - ${EVENT_DETAILS.dinnerEnd}</p>
+                    <p><strong>Reservation Type:</strong> ${eventTypeName}</p>
+                    ${isDinner ? `<p><strong>Dinner Seating Time:</strong> ${data.dinnerTime}</p>
+                    <p><strong>Dinner Service:</strong> ${EVENT_DETAILS.dinnerStart} - ${EVENT_DETAILS.dinnerEnd}</p>` : ''}
                     <p><strong>Social Event:</strong> ${EVENT_DETAILS.socialStart} - ${EVENT_DETAILS.socialEnd}</p>
                     <p><strong>Location:</strong> ${EVENT_DETAILS.location}</p>
                     <p><strong>Number of Guests:</strong> ${data.guests}</p>
@@ -252,11 +255,11 @@ async function sendConfirmationEmail(data) {
                     ${data.notes ? `<p><strong>Special Requests:</strong> ${data.notes}</p>` : ''}
                 </div>
                 
-                <div style="background: #fff4e6; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                ${isDinner ? `<div style="background: #fff4e6; padding: 15px; border-radius: 8px; margin: 20px 0;">
                     <p style="margin: 0;"><strong>Important:</strong> Please arrive 5-10 minutes before your seating time. Your table will be held for 15 minutes past your reservation time.</p>
-                </div>
+                </div>` : ''}
                 
-                <p>We look forward to hosting you for this exclusive evening!</p>
+                <p>We look forward to hosting you for this special evening!</p>
                 <p>If you have any questions or need to modify your reservation, please don't hesitate to contact us.</p>
                 
                 <p style="margin-top: 40px; color: #666; font-size: 14px;">
@@ -284,58 +287,87 @@ function showSuccess(data) {
     form.style.display = 'none';
     successMessage.style.display = 'block';
     
+    const isDinner = data.eventType === 'dinner-social';
+    const eventTypeName = isDinner ? 'Dinner + Social' : 'Social Only';
+    
     // Display reservation details
-    reservationDetails.innerHTML = `
-        <p><strong>Date:</strong> Wednesday, December 10th, 2025</p>
-        <p><strong>Dinner Seating:</strong> ${data.dinnerTime}</p>
+    let detailsHTML = `
+        <p><strong>Date:</strong> Wednesday, December 17th, 2025</p>
+        <p><strong>Reservation Type:</strong> ${eventTypeName}</p>
+    `;
+    
+    if (isDinner && data.dinnerTime !== 'N/A') {
+        detailsHTML += `<p><strong>Dinner Seating:</strong> ${data.dinnerTime}</p>`;
+    }
+    
+    detailsHTML += `
         <p><strong>Number of Guests:</strong> ${data.guests}</p>
         <p><strong>Location:</strong> Lobby Hamilton, Hamilton, ON</p>
     `;
+    
+    reservationDetails.innerHTML = detailsHTML;
     
     // Store data for calendar downloads
     successMessage.dataset.dinnerTime = data.dinnerTime;
     successMessage.dataset.guestName = data.name;
     successMessage.dataset.guests = data.guests;
+    successMessage.dataset.eventType = data.eventType;
 }
 
 // Calendar button handlers
 addToAppleBtn.addEventListener('click', () => {
     const dinnerTime = successMessage.dataset.dinnerTime;
-    downloadICSFile(dinnerTime);
+    const eventType = successMessage.dataset.eventType;
+    downloadICSFile(dinnerTime, eventType);
 });
 
 addToGoogleBtn.addEventListener('click', () => {
     const dinnerTime = successMessage.dataset.dinnerTime;
-    openGoogleCalendar(dinnerTime);
+    const eventType = successMessage.dataset.eventType;
+    openGoogleCalendar(dinnerTime, eventType);
 });
 
 // Generate ICS file for Apple Calendar
-function downloadICSFile(dinnerTime) {
-    // Convert dinner time to 24-hour format for ICS
-    let startHour = '18'; // Default 6 PM
-    if (dinnerTime === '6:15 PM') startHour = '1815';
-    else if (dinnerTime === '6:30 PM') startHour = '1830';
-    else startHour = '1800';
+function downloadICSFile(dinnerTime, eventType) {
+    const isDinner = eventType === 'dinner-social';
     
-    const startDate = `20251210T${startHour}00`;
-    const endDate = '20251211T000000'; // Until midnight
+    // Convert dinner time to 24-hour format for ICS
+    let startHour = '20'; // Default 8 PM (social only)
+    let startMin = '00';
+    
+    if (isDinner && dinnerTime !== 'N/A') {
+        if (dinnerTime === '6:15 PM') {
+            startHour = '18';
+            startMin = '15';
+        } else if (dinnerTime === '6:30 PM') {
+            startHour = '18';
+            startMin = '30';
+        } else {
+            startHour = '18';
+            startMin = '00';
+        }
+    }
+    
+    const startDate = `20251217T${startHour}${startMin}00`;
+    const endDate = '20251218T000000'; // Until midnight
+    const eventTitle = isDinner ? `Ladies Night - Dinner + Social` : `Ladies Night - Social`;
     
     const icsContent = `BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//Lobby Hamilton//Ladies Night VIP//EN
+PRODID:-//Lobby Hamilton//Ladies Night//EN
 BEGIN:VEVENT
 UID:${Date.now()}@lobbyhamilton.com
 DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z
 DTSTART:${startDate}
 DTEND:${endDate}
-SUMMARY:Ladies Night VIP - Dinner + Social
-DESCRIPTION:VIP Dinner reservation at ${dinnerTime} followed by the Ladies Night launch celebration. ${EVENT_DETAILS.description}
+SUMMARY:${eventTitle}
+DESCRIPTION:${isDinner ? `Dinner reservation at ${dinnerTime} followed by Ladies Night celebration.` : 'Ladies Night celebration starting at 8:00 PM.'} ${EVENT_DETAILS.description}
 LOCATION:${EVENT_DETAILS.location}
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT2H
 ACTION:DISPLAY
-DESCRIPTION:Reminder: VIP Dinner reservation in 2 hours
+DESCRIPTION:Reminder: Ladies Night ${isDinner ? 'dinner reservation' : 'event'} in 2 hours
 END:VALARM
 END:VEVENT
 END:VCALENDAR`;
@@ -343,24 +375,32 @@ END:VCALENDAR`;
     const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
     const link = document.createElement('a');
     link.href = window.URL.createObjectURL(blob);
-    link.download = 'ladies-night-vip-lobby-hamilton.ics';
+    link.download = 'ladies-night-lobby-hamilton.ics';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 }
 
 // Open Google Calendar
-function openGoogleCalendar(dinnerTime) {
+function openGoogleCalendar(dinnerTime, eventType) {
+    const isDinner = eventType === 'dinner-social';
+    
     // Convert dinner time to format Google Calendar expects
-    let startTime = '180000';
-    if (dinnerTime === '6:15 PM') startTime = '181500';
-    else if (dinnerTime === '6:30 PM') startTime = '183000';
+    let startTime = '200000'; // Default 8 PM (social only)
     
-    const startDate = `20251210T${startTime}`;
-    const endDate = '20251211T000000';
+    if (isDinner && dinnerTime !== 'N/A') {
+        if (dinnerTime === '6:15 PM') startTime = '181500';
+        else if (dinnerTime === '6:30 PM') startTime = '183000';
+        else startTime = '180000';
+    }
     
-    const eventTitle = `Ladies Night VIP - Dinner at ${dinnerTime}`;
-    const eventDescription = `VIP Dinner reservation at ${dinnerTime} followed by the Ladies Night launch celebration. ${EVENT_DETAILS.description}`;
+    const startDate = `20251217T${startTime}`;
+    const endDate = '20251218T000000';
+    
+    const eventTitle = isDinner ? `Ladies Night - Dinner at ${dinnerTime}` : `Ladies Night at Lobby Hamilton`;
+    const eventDescription = isDinner 
+        ? `Dinner reservation at ${dinnerTime} followed by the Ladies Night celebration. ${EVENT_DETAILS.description}`
+        : `Ladies Night celebration starting at 8:00 PM. ${EVENT_DETAILS.description}`;
     
     const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${startDate}/${endDate}&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(EVENT_DETAILS.location)}`;
     

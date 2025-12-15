@@ -50,9 +50,6 @@ form.addEventListener('submit', async (e) => {
         // Submit to Google Sheets
         await submitToGoogleSheets(formData);
         
-        // Send confirmation email
-        await sendConfirmationEmail(formData);
-        
         // Show success message
         showSuccess(formData);
         

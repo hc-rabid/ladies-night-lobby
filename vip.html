@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ladies Night at Lobby Hamilton - VIP Dinner Invitation</title>
+    <title>Ladies Night at Lobby Hamilton - Special Guest Invitation</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,21 +20,13 @@
         <section class="event-section">
             <div class="event-details">
                 <h2>You're Invited</h2>
-                <h3>Ladies Night Launch</h3>
-                <p class="event-subtitle vip-badge">VIP Experience: Dinner & Celebration</p>
+                <h3>Ladies Night</h3>
+                <p class="event-subtitle vip-badge">You're Our Special Guest</p>
                 
                 <div class="event-info">
                     <div class="info-item">
                         <span class="label">Date</span>
-                        <span class="value">Wednesday, December 10th, 2025</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="label">Dinner</span>
-                        <span class="value">6:00 PM - 8:00 PM</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="label">Social Event</span>
-                        <span class="value">8:00 PM - Late</span>
+                        <span class="value">Wednesday, December 17th, 2025</span>
                     </div>
                     <div class="info-item">
                         <span class="label">Location</span>
@@ -42,47 +34,27 @@
                     </div>
                 </div>
                 
-                <!-- <p class="event-description">
-                    You've been chosen for an exclusive VIP experience. Begin your evening with an intimate dinner 
-                    featuring exquisite cuisine, followed by the official Ladies Night celebration. This is a night 
-                    designed for connection, elegance, and creating unforgettable moments with an exceptional group 
-                    of inspiring women.
-                </p> -->
-
-                <div class="launch-announcement">
-                    <p><strong>✨ Introducing Ladies Night at Lobby Hamilton ✨</strong></p>
-                    <p>Starting December 17th, join us every Wednesday for an unforgettable evening designed exclusively for women. This launch event on December 10th is your first taste of what's to come!</p>
-                </div>
+                <p class="event-description">
+                    Join us this Wednesday for an unforgettable evening at Lobby Hamilton. Experience an atmosphere 
+                    designed exclusively for women, featuring exceptional hospitality, signature cocktails, and 
+                    incredible company. We're thrilled to have you as our special guest!
+                </p>
 
                 <div class="inclusions">
-                    <h4>Your VIP Experience Includes</h4>
+                    <h4>Your Experience Includes</h4>
                     
-                    <div class="vip-offerings-group">
-                        <div class="vip-group-header">VIP Exclusive</div>
-                        <div class="inclusions-grid">
-                            <div class="inclusion-item">
-                                <span class="icon">🍽️</span>
-                                <p>One Shareable per Person</p>
-                            </div>
-                            <div class="inclusion-item">
-                                <span class="icon">🌹</span>
-                                <p>One Glass of Rosé</p>
-                            </div>
-                            <div class="inclusion-item">
-                                <span class="icon">🍸</span>
-                                <p>Two Classic Cocktails per Person</p>
-                            </div>
-                        </div>
-                    </div>
-
                     <div class="inclusions-grid">
                         <div class="inclusion-item">
                             <span class="icon">🥂</span>
                             <p>Welcome Drink</p>
                         </div>
                         <div class="inclusion-item">
-                            <span class="icon">🎵</span>
-                            <p>Live Entertainment</p>
+                            <span class="icon">🍸</span>
+                            <p>Two Classic Cocktails</p>
+                        </div>
+                        <div class="inclusion-item">
+                            <span class="icon">🍽️</span>
+                            <p>One Appetizer</p>
                         </div>
                         <div class="inclusion-item">
                             <span class="icon">💿</span>
@@ -99,10 +71,20 @@
 
         <!-- RSVP Form Section -->
         <section class="rsvp-section">
-            <h2>Reserve Your Experience</h2>
-            <p class="rsvp-subtitle">Confirm your VIP reservation for this exclusive evening</p>
+            <h2>Reserve Your Spot</h2>
+            <p class="rsvp-subtitle">Let us know you're coming</p>
             
             <form id="rsvpForm" class="rsvp-form">
+                <div class="form-group">
+                    <label for="eventType">I would like to reserve for *</label>
+                    <select id="eventType" name="eventType" required>
+                        <option value="">Select...</option>
+                        <option value="dinner-social">Dinner + Social</option>
+                        <option value="social">Social Only</option>
+                    </select>
+                    <small class="help-text">Dinner service begins at 6:00 PM. Social portion starts at 8:00 PM.</small>
+                </div>
+
                 <div class="form-group">
                     <label for="name">Full Name *</label>
                     <input type="text" id="name" name="name" required>
@@ -132,15 +114,14 @@
                     </select>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" id="dinnerTimeGroup" style="display: none;">
                     <label for="dinnerTime">Preferred Dinner Seating Time *</label>
-                    <select id="dinnerTime" name="dinnerTime" required>
+                    <select id="dinnerTime" name="dinnerTime">
                         <option value="">Select a time slot...</option>
-                        <option value="6:00 PM" data-capacity="20">6:00 PM</option>
-                        <option value="6:15 PM" data-capacity="20">6:15 PM</option>
-                        <option value="6:30 PM" data-capacity="20">6:30 PM</option>
+                        <option value="6:00 PM">6:00 PM</option>
+                        <option value="6:15 PM">6:15 PM</option>
+                        <option value="6:30 PM">6:30 PM</option>
                     </select>
-                    <small class="capacity-info" id="capacityInfo"></small>
                 </div>
 
                 <div class="form-group">
@@ -156,8 +137,8 @@
 
             <!-- Success Message -->
             <div id="successMessage" class="success-message" style="display: none;">
-                <h3>✨ Your VIP Reservation is Confirmed!</h3>
-                <p>We're honored you'll be joining us for this exclusive experience. Your confirmation email with all the details is on its way.</p>
+                <h3>✨ You're on the List!</h3>
+                <p>We're thrilled you'll be joining us this Wednesday! Your confirmation email with all the details is on its way.</p>
                 <div class="reservation-details" id="reservationDetails"></div>
                 <div class="calendar-buttons">
                     <p>Add to your calendar:</p>
@@ -188,7 +169,7 @@
     <!-- Bottom CTA Banner -->
     <div class="bottom-banner" id="bottomBanner">
         <div class="bottom-banner-content">
-            Reserve Your VIP Spot <span>↓</span>
+            Reserve Your Spot <span>↓</span>
         </div>
     </div>
 
