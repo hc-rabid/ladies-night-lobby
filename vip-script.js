@@ -146,7 +146,7 @@ async function submitToGoogleSheets(data) {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            sheet: 'SpecialGuestRSVPs',
+            sheet: 'VIPRSVPs',
             data: data
         })
     });
