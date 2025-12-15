@@ -845,6 +845,7 @@ footer {
     display: flex;
     flex-direction: column;
     gap: 5px;
+    text-align: center;
 }
 
 .offering-content strong {
