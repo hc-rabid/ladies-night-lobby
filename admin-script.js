@@ -16,8 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     populateWeekFilter();
     loadAllData();
     updateDinnerStatusDisplay();
-    // Hide Type column by default
-    hideColumnByDefault('type');
     // Auto-refresh every 30 seconds
     setInterval(loadAllData, 30000);
 });
@@ -42,6 +40,9 @@ async function loadAllData() {
         
         // Apply current filter
         applyWeekFilter();
+        
+        // Hide Type column by default (after tables are rendered)
+        setTimeout(() => hideColumnByDefault('type'), 100);
         
         updateLastUpdated();
     } catch (error) {
