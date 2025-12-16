@@ -252,22 +252,14 @@ function formatTimestamp(timestamp) {
 
 // Format dinner time from Google Sheets
 function formatDinnerTime(timeValue) {
-    if (!timeValue) return '-';
+    if (!timeValue || timeValue === '-') return '-';
     
-    // If it's already a string like "6:00 PM", return it
-    if (typeof timeValue === 'string' && timeValue.includes(':')) {
+    // If it's already a simple string (like "6:00 PM"), just return it
+    if (typeof timeValue === 'string') {
         return timeValue;
     }
     
-    // If it's a date object from Google Sheets, extract the time portion
-    const date = new Date(timeValue);
-    if (isNaN(date.getTime())) return '-';
-    
-    return date.toLocaleTimeString('en-US', { 
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
-    });
+    return '-';
 }
 
 // Update last updated timestamp
