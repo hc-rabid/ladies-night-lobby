@@ -12,6 +12,7 @@ let capacityData = {};
 // Load all data on page load
 document.addEventListener('DOMContentLoaded', () => {
     loadAllData();
+    updateDinnerStatusDisplay();
     // Auto-refresh every 30 seconds
     setInterval(loadAllData, 30000);
 });
@@ -263,4 +264,34 @@ function showError(message) {
     container.insertBefore(errorDiv, container.firstChild);
     
     setTimeout(() => errorDiv.remove(), 5000);
+}
+// Toggle dinner availability
+function toggleDinnerAvailability() {
+    const currentStatus = localStorage.getItem('dinnerAvailable') === 'true';
+    const newStatus = !currentStatus;
+    
+    localStorage.setItem('dinnerAvailable', newStatus.toString());
+    
+    updateDinnerStatusDisplay();
+    
+    // Show confirmation
+    const message = newStatus ? 'Dinner reservations are now ENABLED' : 'Dinner reservations are now DISABLED';
+    alert(message);
+}
+
+// Update dinner status display in admin
+function updateDinnerStatusDisplay() {
+    const isDinnerAvailable = localStorage.getItem('dinnerAvailable') === 'true';
+    const statusText = document.getElementById('dinnerStatusText');
+    const statusIndicator = document.getElementById('dinnerStatusIndicator');
+    
+    if (isDinnerAvailable) {
+        statusText.textContent = 'Disable Dinner Reservations';
+        statusIndicator.textContent = '● Currently Enabled';
+        statusIndicator.style.color = '#4CAF50';
+    } else {
+        statusText.textContent = 'Enable Dinner Reservations';
+        statusIndicator.textContent = '● Currently Disabled';
+        statusIndicator.style.color = '#c75450';
+    }
 }

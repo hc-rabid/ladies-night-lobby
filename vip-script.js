@@ -43,6 +43,25 @@ eventTypeSelect.addEventListener('change', (e) => {
     }
 });
 
+// Check dinner availability on page load
+function checkDinnerAvailability() {
+    const isDinnerAvailable = localStorage.getItem('dinnerAvailable') === 'true';
+    const dinnerOption = document.getElementById('dinnerSocialOption');
+    
+    if (isDinnerAvailable) {
+        dinnerOption.disabled = false;
+        dinnerOption.textContent = 'Dinner + Social';
+    } else {
+        dinnerOption.disabled = true;
+        dinnerOption.textContent = 'Dinner + Social (Fully Booked)';
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', () => {
+    checkDinnerAvailability();
+});
+
 // Form submission handler
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
