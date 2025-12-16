@@ -129,7 +129,7 @@ function renderAllTable() {
             <td data-col="phone">${escapeHtml(rsvp.phone)}</td>
             <td data-col="instagram">${escapeHtml(rsvp.instagram)}</td>
             <td data-col="guests">${rsvp.guests}</td>
-            <td data-col="time">${rsvp.dinnertime ? escapeHtml(rsvp.dinnertime) : '-'}</td>
+            <td data-col="time">${formatDinnerTime(rsvp.dinnertime)}</td>
             <td data-col="notes">${rsvp.notes ? escapeHtml(rsvp.notes) : '-'}</td>
             <td data-col="timestamp">${formatTimestamp(rsvp.timestamp)}</td>
         </tr>
@@ -153,7 +153,7 @@ function renderVIPTable() {
             <td>${escapeHtml(rsvp.phone)}</td>
             <td>${escapeHtml(rsvp.instagram)}</td>
             <td>${rsvp.guests}</td>
-            <td><span class="time-slot">${escapeHtml(rsvp.dinnertime)}</span></td>
+            <td><span class="time-slot">${formatDinnerTime(rsvp.dinnertime)}</span></td>
             <td>${rsvp.notes ? escapeHtml(rsvp.notes) : '-'}</td>
             <td>${formatTimestamp(rsvp.timestamp)}</td>
         </tr>
@@ -247,6 +247,26 @@ function formatTimestamp(timestamp) {
     return date.toLocaleDateString('en-US', { 
         month: 'short', 
         day: 'numeric'
+    });
+}
+
+// Format dinner time from Google Sheets
+function formatDinnerTime(timeValue) {
+    if (!timeValue) return '-';
+    
+    // If it's already a string like "6:00 PM", return it
+    if (typeof timeValue === 'string' && timeValue.includes(':')) {
+        return timeValue;
+    }
+    
+    // If it's a date object from Google Sheets, extract the time portion
+    const date = new Date(timeValue);
+    if (isNaN(date.getTime())) return '-';
+    
+    return date.toLocaleTimeString('en-US', { 
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
     });
 }
 
