@@ -352,20 +352,60 @@
             <button class="tab-btn" onclick="switchTab('capacity')">Capacity</button>
         </div>
 
+        <!-- Column Visibility Controls -->
+        <div id="columnToggles" style="background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); display: none;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                <h4 style="margin: 0; font-size: 0.9rem; color: var(--primary-color);">Show/Hide Columns</h4>
+                <button onclick="toggleColumnControls()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--text-gray);">✕</button>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; font-size: 0.85rem;">
+                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                    <input type="checkbox" class="col-toggle" data-col="type" checked onchange="toggleColumn(this)"> Type
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                    <input type="checkbox" class="col-toggle" data-col="name" checked onchange="toggleColumn(this)"> Name
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                    <input type="checkbox" class="col-toggle" data-col="email" checked onchange="toggleColumn(this)"> Email
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                    <input type="checkbox" class="col-toggle" data-col="phone" checked onchange="toggleColumn(this)"> Phone
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                    <input type="checkbox" class="col-toggle" data-col="instagram" onchange="toggleColumn(this)"> Instagram
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                    <input type="checkbox" class="col-toggle" data-col="guests" checked onchange="toggleColumn(this)"> Guests
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                    <input type="checkbox" class="col-toggle" data-col="time" checked onchange="toggleColumn(this)"> Time
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                    <input type="checkbox" class="col-toggle" data-col="notes" onchange="toggleColumn(this)"> Notes
+                </label>
+                <label style="display: flex; align-items: center; gap: 5px; cursor: pointer;">
+                    <input type="checkbox" class="col-toggle" data-col="timestamp" onchange="toggleColumn(this)"> Timestamp
+                </label>
+            </div>
+        </div>
+        <div style="text-align: center; margin-bottom: 15px;">
+            <button onclick="toggleColumnControls()" style="background: var(--secondary-color); color: white; border: none; padding: 8px 20px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-family: 'Montserrat', sans-serif; font-weight: 600;">⚙ Show/Hide Columns</button>
+        </div>
+
         <div id="all-tab" class="tab-content active">
             <div class="table-container">
                 <table class="data-table">
                     <thead>
                         <tr>
-                            <th>Type</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Instagram</th>
-                            <th>Guests</th>
-                            <th>Time</th>
-                            <th>Notes</th>
-                            <th>Timestamp</th>
+                            <th data-col="type">Type</th>
+                            <th data-col="name">Name</th>
+                            <th data-col="email">Email</th>
+                            <th data-col="phone">Phone</th>
+                            <th data-col="instagram">Instagram</th>
+                            <th data-col="guests">Guests</th>
+                            <th data-col="time">Time</th>
+                            <th data-col="notes">Notes</th>
+                            <th data-col="timestamp">Timestamp</th>
                         </tr>
                     </thead>
                     <tbody id="allTableBody">

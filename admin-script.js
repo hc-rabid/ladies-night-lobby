@@ -120,15 +120,15 @@ function renderAllTable() {
     
     tbody.innerHTML = dataToRender.map(rsvp => `
         <tr>
-            <td><span class="badge ${rsvp.type.toLowerCase()}">${rsvp.type}</span></td>
-            <td>${escapeHtml(rsvp.name)}</td>
-            <td>${escapeHtml(rsvp.email)}</td>
-            <td>${escapeHtml(rsvp.phone)}</td>
-            <td>${escapeHtml(rsvp.instagram)}</td>
-            <td>${rsvp.guests}</td>
-            <td>${rsvp.dinnerTime ? `<span class="time-slot">${escapeHtml(rsvp.dinnerTime)}</span>` : '-'}</td>
-            <td>${rsvp.notes ? escapeHtml(rsvp.notes) : '-'}</td>
-            <td>${formatTimestamp(rsvp.timestamp)}</td>
+            <td data-col="type">${rsvp.type}</td>
+            <td data-col="name">${escapeHtml(rsvp.name)}</td>
+            <td data-col="email">${escapeHtml(rsvp.email)}</td>
+            <td data-col="phone">${escapeHtml(rsvp.phone)}</td>
+            <td data-col="instagram">${escapeHtml(rsvp.instagram)}</td>
+            <td data-col="guests">${rsvp.guests}</td>
+            <td data-col="time">${rsvp.dinnerTime ? escapeHtml(rsvp.dinnerTime) : '-'}</td>
+            <td data-col="notes">${rsvp.notes ? escapeHtml(rsvp.notes) : '-'}</td>
+            <td data-col="timestamp">${formatTimestamp(rsvp.timestamp)}</td>
         </tr>
     `).join('');
 }
@@ -318,28 +318,35 @@ function populateWeekFilter() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
+    // First event date: December 10, 2025 (Wednesday)
+    const firstEventDate = new Date(2025, 11, 10); // Month is 0-indexed
+    firstEventDate.setHours(0, 0, 0, 0);
+    
     // Get the next upcoming Wednesday
     const nextWed = getNextWednesday(today);
     
-    // Generate options for 2 weeks before and 2 weeks after
+    // Generate all event dates from Dec 10 to next week
     const weeks = [];
     
-    // Previous 2 weeks
-    for (let i = 2; i > 0; i--) {
-        const eventDate = new Date(nextWed);
-        eventDate.setDate(eventDate.getDate() - (i * 7));
-        weeks.push(eventDate);
+    // Add all past events starting from Dec 10
+    let currentEventDate = new Date(firstEventDate);
+    while (currentEventDate <= today) {
+        weeks.push(new Date(currentEventDate));
+        currentEventDate.setDate(currentEventDate.getDate() + 7);
     }
     
-    // Next 2 weeks (including current week's event)
-    for (let i = 0; i < 2; i++) {
-        const eventDate = new Date(nextWed);
-        eventDate.setDate(eventDate.getDate() + (i * 7));
-        weeks.push(eventDate);
+    // Add current week's event if not already added
+    if (!weeks.some(d => d.getTime() === nextWed.getTime())) {
+        weeks.push(new Date(nextWed));
     }
+    
+    // Add next week's event
+    const nextNextWed = new Date(nextWed);
+    nextNextWed.setDate(nextNextWed.getDate() + 7);
+    weeks.push(nextNextWed);
     
     // Clear existing options except 'All RSVPs'
-    select.innerHTML = '<option value=\"all\">All RSVPs</option>';
+    select.innerHTML = '<option value="all">All RSVPs</option>';
     
     // Add week options
     weeks.forEach(eventDate => {
@@ -350,9 +357,10 @@ function populateWeekFilter() {
             year: 'numeric'
         });
         
-        // Calculate the cutoff date (previous Wednesday)
+        // Calculate the cutoff date (day after previous Wednesday)
         const cutoffDate = new Date(eventDate);
-        cutoffDate.setDate(cutoffDate.getDate() - 7);
+        cutoffDate.setDate(cutoffDate.getDate() - 6); // 6 days before = day after previous Wednesday
+        cutoffDate.setHours(0, 0, 0, 0); // Start of day
         
         option.value = cutoffDate.toISOString();
         option.textContent = `${dateStr} Event`;
@@ -389,4 +397,27 @@ function applyWeekFilter() {
     renderVIPTable();
     renderSocialTable();
     renderCapacityTable();
+}
+
+// Column visibility toggle functions
+function toggleColumnControls() {
+    const panel = document.getElementById('columnToggles');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+function toggleColumn(checkbox) {
+    const colName = checkbox.dataset.col;
+    const isVisible = checkbox.checked;
+    
+    // Toggle visibility for headers and cells
+    const headers = document.querySelectorAll(`th[data-col="${colName}"]`);
+    const cells = document.querySelectorAll(`td[data-col="${colName}"]`);
+    
+    headers.forEach(header => {
+        header.style.display = isVisible ? '' : 'none';
+    });
+    
+    cells.forEach(cell => {
+        cell.style.display = isVisible ? '' : 'none';
+    });
 }
