@@ -8,9 +8,12 @@ let allRSVPs = [];
 let vipRSVPs = [];
 let socialRSVPs = [];
 let capacityData = {};
+let currentWeekFilter = 'all';
+let filteredRSVPs = [];
 
 // Load all data on page load
 document.addEventListener('DOMContentLoaded', () => {
+    populateWeekFilter();
     loadAllData();
     updateDinnerStatusDisplay();
     // Auto-refresh every 30 seconds
@@ -35,11 +38,8 @@ async function loadAllData() {
         // Sort by timestamp (most recent first)
         allRSVPs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
         
-        updateStats();
-        renderAllTable();
-        renderVIPTable();
-        renderSocialTable();
-        renderCapacityTable();
+        // Apply current filter
+        applyWeekFilter();
         
         updateLastUpdated();
     } catch (error) {
@@ -95,25 +95,30 @@ async function loadCapacityData() {
 
 // Update statistics
 function updateStats() {
-    const totalVIPGuests = vipRSVPs.reduce((sum, r) => sum + parseInt(r.guests || 0), 0);
-    const totalSocialGuests = socialRSVPs.reduce((sum, r) => sum + parseInt(r.guests || 0), 0);
+    const filtered = filteredRSVPs.length > 0 ? filteredRSVPs : allRSVPs;
+    const filteredVIP = filtered.filter(r => r.type === 'VIP');
+    const filteredSocial = filtered.filter(r => r.type === 'Social');
     
-    document.getElementById('totalRSVPs').textContent = allRSVPs.length;
-    document.getElementById('vipRSVPs').textContent = vipRSVPs.length;
-    document.getElementById('socialRSVPs').textContent = socialRSVPs.length;
+    const totalVIPGuests = filteredVIP.reduce((sum, r) => sum + parseInt(r.guests || 0), 0);
+    const totalSocialGuests = filteredSocial.reduce((sum, r) => sum + parseInt(r.guests || 0), 0);
+    
+    document.getElementById('totalRSVPs').textContent = filtered.length;
+    document.getElementById('vipRSVPs').textContent = filteredVIP.length;
+    document.getElementById('socialRSVPs').textContent = filteredSocial.length;
     document.getElementById('totalGuests').textContent = totalVIPGuests + totalSocialGuests;
 }
 
 // Render all RSVPs table
 function renderAllTable() {
     const tbody = document.getElementById('allTableBody');
+    const dataToRender = filteredRSVPs.length > 0 ? filteredRSVPs : allRSVPs;
     
-    if (allRSVPs.length === 0) {
+    if (dataToRender.length === 0) {
         tbody.innerHTML = '<tr><td colspan="9" class="loading">No RSVPs yet</td></tr>';
         return;
     }
     
-    tbody.innerHTML = allRSVPs.map(rsvp => `
+    tbody.innerHTML = dataToRender.map(rsvp => `
         <tr>
             <td><span class="badge ${rsvp.type.toLowerCase()}">${rsvp.type}</span></td>
             <td>${escapeHtml(rsvp.name)}</td>
@@ -131,13 +136,14 @@ function renderAllTable() {
 // Render VIP table
 function renderVIPTable() {
     const tbody = document.getElementById('vipTableBody');
+    const dataToRender = filteredRSVPs.length > 0 ? filteredRSVPs.filter(r => r.type === 'VIP') : vipRSVPs;
     
-    if (vipRSVPs.length === 0) {
+    if (dataToRender.length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" class="loading">No VIP RSVPs yet</td></tr>';
         return;
     }
     
-    tbody.innerHTML = vipRSVPs.map(rsvp => `
+    tbody.innerHTML = dataToRender.map(rsvp => `
         <tr>
             <td>${escapeHtml(rsvp.name)}</td>
             <td>${escapeHtml(rsvp.email)}</td>
@@ -154,8 +160,9 @@ function renderVIPTable() {
 // Render social table
 function renderSocialTable() {
     const tbody = document.getElementById('socialTableBody');
+    const dataToRender = filteredRSVPs.length > 0 ? filteredRSVPs.filter(r => r.type === 'Social') : socialRSVPs;
     
-    if (socialRSVPs.length === 0) {
+    if (dataToRender.length === 0) {
         tbody.innerHTML = '<tr><td colspan="6" class="loading">No late night RSVPs yet</td></tr>';
         return;
     }
@@ -294,4 +301,92 @@ function updateDinnerStatusDisplay() {
         statusIndicator.textContent = '● Currently Disabled';
         statusIndicator.style.color = '#c75450';
     }
+}
+// Get next Wednesday from a given date
+function getNextWednesday(date) {
+    const result = new Date(date);
+    const day = result.getDay();
+    const daysUntilWednesday = (3 - day + 7) % 7 || 7; // 3 = Wednesday
+    result.setDate(result.getDate() + daysUntilWednesday);
+    result.setHours(0, 0, 0, 0);
+    return result;
+}
+
+// Populate week filter dropdown
+function populateWeekFilter() {
+    const select = document.getElementById('weekFilter');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    // Get the next upcoming Wednesday
+    const nextWed = getNextWednesday(today);
+    
+    // Generate options for 2 weeks before and 2 weeks after
+    const weeks = [];
+    
+    // Previous 2 weeks
+    for (let i = 2; i > 0; i--) {
+        const eventDate = new Date(nextWed);
+        eventDate.setDate(eventDate.getDate() - (i * 7));
+        weeks.push(eventDate);
+    }
+    
+    // Next 2 weeks (including current week's event)
+    for (let i = 0; i < 2; i++) {
+        const eventDate = new Date(nextWed);
+        eventDate.setDate(eventDate.getDate() + (i * 7));
+        weeks.push(eventDate);
+    }
+    
+    // Clear existing options except 'All RSVPs'
+    select.innerHTML = '<option value=\"all\">All RSVPs</option>';
+    
+    // Add week options
+    weeks.forEach(eventDate => {
+        const option = document.createElement('option');
+        const dateStr = eventDate.toLocaleDateString('en-US', { 
+            month: 'short', 
+            day: 'numeric',
+            year: 'numeric'
+        });
+        
+        // Calculate the cutoff date (previous Wednesday)
+        const cutoffDate = new Date(eventDate);
+        cutoffDate.setDate(cutoffDate.getDate() - 7);
+        
+        option.value = cutoffDate.toISOString();
+        option.textContent = `${dateStr} Event`;
+        
+        // Mark current/next event
+        if (eventDate.getTime() === nextWed.getTime()) {
+            option.textContent += ' (Next Event)';
+            option.selected = true;
+            currentWeekFilter = option.value;
+        }
+        
+        select.appendChild(option);
+    });
+}
+
+// Apply week filter
+function applyWeekFilter() {
+    const select = document.getElementById('weekFilter');
+    currentWeekFilter = select.value;
+    
+    if (currentWeekFilter === 'all') {
+        filteredRSVPs = [...allRSVPs];
+    } else {
+        const cutoffDate = new Date(currentWeekFilter);
+        filteredRSVPs = allRSVPs.filter(rsvp => {
+            const rsvpDate = new Date(rsvp.timestamp);
+            return rsvpDate >= cutoffDate;
+        });
+    }
+    
+    // Update displays with filtered data
+    updateStats();
+    renderAllTable();
+    renderVIPTable();
+    renderSocialTable();
+    renderCapacityTable();
 }

@@ -900,3 +900,236 @@ select option:disabled {
     font-style: italic;
 }
 
+/* ========================================
+   ADMIN DASHBOARD MOBILE RESPONSIVE STYLES
+   ======================================== */
+
+/* Mobile - Tablets and smaller */
+@media (max-width: 768px) {
+    /* Admin container */
+    .admin-container {
+        padding: 20px 10px !important;
+    }
+
+    /* Admin header */
+    .admin-header h1 {
+        font-size: 1.8rem !important;
+    }
+
+    /* Filter controls - stack vertically */
+    .admin-header > div {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+
+    .admin-header select,
+    .admin-header .refresh-btn {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    /* Stats grid - 2 columns on tablet */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+    }
+
+    .stat-card {
+        padding: 15px !important;
+    }
+
+    .stat-card h3 {
+        font-size: 0.75rem !important;
+    }
+
+    .stat-card .number {
+        font-size: 1.8rem !important;
+    }
+
+    /* Tabs - make scrollable horizontally */
+    .tabs {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+
+    .tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .tab-btn {
+        padding: 12px 20px !important;
+        font-size: 0.9rem !important;
+        white-space: nowrap;
+    }
+
+    /* Table container - remove horizontal scroll */
+    .table-container {
+        overflow-x: visible !important;
+        border-radius: 8px !important;
+    }
+
+    /* Make tables responsive with smaller font and padding */
+    .data-table {
+        font-size: 0.75rem;
+    }
+
+    .data-table th {
+        padding: 10px 6px !important;
+        font-size: 0.7rem !important;
+        letter-spacing: 0.3px !important;
+    }
+
+    .data-table td {
+        padding: 10px 6px !important;
+        word-break: break-word;
+    }
+
+    /* Compact table cell content */
+    .data-table td,
+    .data-table th {
+        max-width: 100px;
+    }
+
+    /* Badge smaller */
+    .badge {
+        padding: 3px 8px !important;
+        font-size: 0.65rem !important;
+    }
+
+    /* Refresh button */
+    .refresh-btn {
+        padding: 10px 20px !important;
+        font-size: 0.85rem !important;
+    }
+
+    /* Capacity control section */
+    #capacity-tab > div:first-child {
+        padding: 15px !important;
+    }
+
+    #capacity-tab h3 {
+        font-size: 1rem !important;
+    }
+
+    #capacity-tab p {
+        font-size: 0.85rem !important;
+    }
+
+    #capacity-tab > div:first-child > div {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+    }
+
+    #toggleDinnerBtn {
+        width: 100%;
+    }
+}
+
+/* Mobile - Phones */
+@media (max-width: 480px) {
+    .admin-container {
+        padding: 15px 5px !important;
+    }
+
+    .admin-header h1 {
+        font-size: 1.4rem !important;
+    }
+
+    .admin-header label {
+        font-size: 0.85rem !important;
+    }
+
+    /* Stats grid - single column on small phones */
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+    }
+
+    .stat-card {
+        padding: 12px !important;
+    }
+
+    .stat-card .number {
+        font-size: 1.5rem !important;
+    }
+
+    /* Make tables even more compact */
+    .data-table {
+        font-size: 0.7rem;
+    }
+
+    .data-table th {
+        padding: 8px 4px !important;
+        font-size: 0.65rem !important;
+    }
+
+    .data-table td {
+        padding: 8px 4px !important;
+    }
+
+    /* Reduce max-width for cells */
+    .data-table td,
+    .data-table th {
+        max-width: 80px;
+    }
+
+    /* Hide less critical columns on very small screens */
+    .data-table th:nth-child(8),
+    .data-table td:nth-child(8) {
+        display: none; /* Hide Notes column */
+    }
+
+    .tab-btn {
+        padding: 10px 15px !important;
+        font-size: 0.85rem !important;
+    }
+
+    .refresh-btn {
+        padding: 8px 16px !important;
+        font-size: 0.8rem !important;
+    }
+
+    .last-updated {
+        font-size: 0.8rem !important;
+    }
+}
+
+/* Very small phones - ultra compact view */
+@media (max-width: 360px) {
+    .data-table {
+        font-size: 0.65rem;
+    }
+
+    .data-table th {
+        padding: 6px 3px !important;
+        font-size: 0.6rem !important;
+    }
+
+    .data-table td {
+        padding: 6px 3px !important;
+    }
+
+    /* Hide timestamp column on very small screens */
+    .data-table th:nth-child(9),
+    .data-table td:nth-child(9),
+    .data-table th:last-child,
+    .data-table td:last-child {
+        display: none;
+    }
+
+    /* Also hide Instagram column */
+    .data-table th:nth-child(5),
+    .data-table td:nth-child(5) {
+        display: none;
+    }
+
+    .stat-card h3 {
+        font-size: 0.7rem !important;
+    }
+
+    .stat-card .number {
+        font-size: 1.3rem !important;
+    }
+}
+

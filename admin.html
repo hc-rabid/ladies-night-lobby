@@ -317,7 +317,13 @@
         <div class="admin-container">
             <div class="admin-header">
                 <h1>Ladies Night RSVP Dashboard</h1>
-                <button class="refresh-btn" onclick="loadAllData()">↻ Refresh Data</button>
+                <div style="display: flex; gap: 15px; justify-content: center; align-items: center; margin-top: 20px;">
+                    <label for="weekFilter" style="font-weight: 600; color: var(--text-dark);">Filter by Event:</label>
+                    <select id="weekFilter" onchange="applyWeekFilter()" style="padding: 10px 20px; border: 2px solid var(--border-color); border-radius: 8px; font-family: 'Montserrat', sans-serif; font-size: 0.95rem; cursor: pointer;">
+                        <option value="all">All RSVPs</option>
+                    </select>
+                    <button class="refresh-btn" onclick="loadAllData()">↻ Refresh Data</button>
+                </div>
             </div>
 
         <div class="stats-grid">
