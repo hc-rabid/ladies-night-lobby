@@ -16,6 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
     populateWeekFilter();
     loadAllData();
     updateDinnerStatusDisplay();
+    // Hide Type column by default
+    hideColumnByDefault('type');
     // Auto-refresh every 30 seconds
     setInterval(loadAllData, 30000);
 });
@@ -232,17 +234,18 @@ function formatTimestamp(timestamp) {
     const now = new Date();
     const diffMs = now - date;
     const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
     
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins} min ago`;
-    if (diffMins < 1440) return `${Math.floor(diffMins / 60)} hours ago`;
+    if (diffMins < 1) return 'Now';
+    if (diffMins < 60) return `${diffMins}M`;
+    if (diffHours < 24) return `${diffHours}H`;
+    if (diffDays < 30) return `${diffDays}D`;
     
+    // For older entries, show short date format
     return date.toLocaleDateString('en-US', { 
         month: 'short', 
-        day: 'numeric', 
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+        day: 'numeric'
     });
 }
 
@@ -419,5 +422,19 @@ function toggleColumn(checkbox) {
     
     cells.forEach(cell => {
         cell.style.display = isVisible ? '' : 'none';
+    });
+}
+
+function hideColumnByDefault(colName) {
+    // Hide column on initial page load
+    const headers = document.querySelectorAll(`th[data-col="${colName}"]`);
+    const cells = document.querySelectorAll(`td[data-col="${colName}"]`);
+    
+    headers.forEach(header => {
+        header.style.display = 'none';
+    });
+    
+    cells.forEach(cell => {
+        cell.style.display = 'none';
     });
 }
