@@ -4,10 +4,44 @@ const CONFIG = {
     EMAIL_SERVICE_URL: 'https://script.google.com/macros/s/AKfycbxdz_zh7e57sZ0sMayu1YSRzEllMSrmpA7eKwme5N0S1PZXn41_6hJWsgmiMx3KdGYb/exec' // Can use same Google Apps Script or separate service
 };
 
+// Get next Wednesday from today
+function getNextWednesday() {
+    const today = new Date();
+    const day = today.getDay();
+    const daysUntilWednesday = (3 - day + 7) % 7 || 7; // 3 = Wednesday
+    const nextWed = new Date(today);
+    nextWed.setDate(today.getDate() + daysUntilWednesday);
+    return nextWed;
+}
+
+// Format date for display
+function formatEventDate(date) {
+    const options = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+}
+
+// Get formatted date string for emails and calendar
+function getFormattedDateString(date) {
+    const options = { month: 'long', day: 'numeric', year: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+}
+
+// Get date in YYYYMMDD format for calendar
+function getCalendarDateString(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}${month}${day}`;
+}
+
+// Initialize event date
+const nextWednesday = getNextWednesday();
+
 // Event Details
 const EVENT_DETAILS = {
     name: 'Ladies Night at Lobby Hamilton',
-    date: 'December 17, 2025',
+    date: getFormattedDateString(nextWednesday),
+    fullDate: formatEventDate(nextWednesday),
     dinnerStart: '6:00 PM',
     dinnerEnd: '8:00 PM',
     socialStart: '8:00 PM',
@@ -28,6 +62,15 @@ const eventTypeSelect = document.getElementById('eventType');
 const dinnerTimeSelect = document.getElementById('dinnerTime');
 const dinnerTimeGroup = document.getElementById('dinnerTimeGroup');
 const reservationDetails = document.getElementById('reservationDetails');
+
+// Update date on page load
+document.addEventListener('DOMContentLoaded', () => {
+    const eventDateElement = document.getElementById('eventDate');
+    if (eventDateElement) {
+        eventDateElement.textContent = EVENT_DETAILS.fullDate;
+    }
+    checkDinnerAvailability();
+});
 
 // Handle event type selection
 eventTypeSelect.addEventListener('change', (e) => {
@@ -299,8 +342,14 @@ function downloadICSFile(dinnerTime, eventType) {
         }
     }
     
-    const startDate = `20251217T${startHour}${startMin}00`;
-    const endDate = '20251218T000000'; // Until midnight
+    // Use dynamic date
+    const eventDateStr = getCalendarDateString(nextWednesday);
+    const nextDay = new Date(nextWednesday);
+    nextDay.setDate(nextDay.getDate() + 1);
+    const nextDayStr = getCalendarDateString(nextDay);
+    
+    const startDate = `${eventDateStr}T${startHour}${startMin}00`;
+    const endDate = `${nextDayStr}T000000`; // Until midnight
     const eventTitle = isDinner ? `Ladies Night - Dinner + Social` : `Ladies Night - Social`;
     
     const icsContent = `BEGIN:VCALENDAR
@@ -345,8 +394,14 @@ function openGoogleCalendar(dinnerTime, eventType) {
         else startTime = '180000';
     }
     
-    const startDate = `20251217T${startTime}`;
-    const endDate = '20251218T000000';
+    // Use dynamic date
+    const eventDateStr = getCalendarDateString(nextWednesday);
+    const nextDay = new Date(nextWednesday);
+    nextDay.setDate(nextDay.getDate() + 1);
+    const nextDayStr = getCalendarDateString(nextDay);
+    
+    const startDate = `${eventDateStr}T${startTime}`;
+    const endDate = `${nextDayStr}T000000`;
     
     const eventTitle = isDinner ? `Ladies Night - Dinner at ${dinnerTime}` : `Ladies Night at Lobby Hamilton`;
     const eventDescription = isDinner 
