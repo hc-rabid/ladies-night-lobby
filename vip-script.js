@@ -58,7 +58,6 @@ const btnLoader = submitBtn.querySelector('.btn-loader');
 const successMessage = document.getElementById('successMessage');
 const addToAppleBtn = document.getElementById('addToApple');
 const addToGoogleBtn = document.getElementById('addToGoogle');
-const eventTypeSelect = document.getElementById('eventType');
 const dinnerTimeSelect = document.getElementById('dinnerTime');
 const dinnerTimeGroup = document.getElementById('dinnerTimeGroup');
 const reservationDetails = document.getElementById('reservationDetails');
@@ -69,29 +68,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (eventDateElement) {
         eventDateElement.textContent = EVENT_DETAILS.fullDate;
     }
-    checkDinnerAvailability();
+    // Show dinner time selection since VIP assumes dinner + social
+    dinnerTimeGroup.style.display = 'block';
+    dinnerTimeSelect.required = true;
 });
 
-// Handle event type selection
-eventTypeSelect.addEventListener('change', (e) => {
-    const eventType = e.target.value;
-    
-    if (eventType === 'dinner-social') {
-        dinnerTimeGroup.style.display = 'block';
-        dinnerTimeSelect.required = true;
-    } else {
-        dinnerTimeGroup.style.display = 'none';
-        dinnerTimeSelect.required = false;
-        dinnerTimeSelect.value = '';
-    }
-});
-
-// Check dinner availability on page load
+// Removed dinner availability check - VIP always includes dinner
 function checkDinnerAvailability() {
-    const isDinnerAvailable = localStorage.getItem('dinnerAvailable') === 'true';
+    // VIP invites always include dinner + social
     const dinnerOption = document.getElementById('dinnerSocialOption');
     
-    if (isDinnerAvailable) {
+    if (dinnerOption) {
         dinnerOption.disabled = false;
         dinnerOption.textContent = 'Dinner + Social';
     } else {
@@ -116,7 +103,7 @@ form.addEventListener('submit', async (e) => {
         phone: document.getElementById('phone').value.trim(),
         instagram: document.getElementById('instagram').value.trim(),
         guests: document.getElementById('guests').value,
-        eventType: document.getElementById('eventType').value,
+        eventType: 'dinner-social',
         dinnerTime: document.getElementById('dinnerTime').value || 'N/A',
         notes: document.getElementById('notes').value.trim(),
         timestamp: new Date().toISOString()
@@ -190,8 +177,8 @@ function validateForm(data) {
     // Update the data with formatted Instagram
     data.instagram = instagram;
     
-    // Validate dinner time (only if dinner-social selected)
-    if (data.eventType === 'dinner-social' && !data.dinnerTime) {
+    // Validate dinner time - required for all VIP reservations
+    if (!data.dinnerTime) {
         showFieldError('dinnerTime', 'Please select a dinner time slot');
         isValid = false;
     }
@@ -218,8 +205,7 @@ async function submitToGoogleSheets(data) {
 
 // Send confirmation email
 async function sendConfirmationEmail(data) {
-    const isDinner = data.eventType === 'dinner-social';
-    const eventTypeName = isDinner ? 'Dinner + Social' : 'Social Only';
+    const eventTypeName = 'Dinner + Social';
     
     const emailData = {
         to: data.email,
@@ -240,8 +226,8 @@ async function sendConfirmationEmail(data) {
                     <p><strong>Event:</strong> ${EVENT_DETAILS.name}</p>
                     <p><strong>Date:</strong> Wednesday, ${EVENT_DETAILS.date}</p>
                     <p><strong>Reservation Type:</strong> ${eventTypeName}</p>
-                    ${isDinner ? `<p><strong>Dinner Seating Time:</strong> ${data.dinnerTime}</p>
-                    <p><strong>Dinner Service:</strong> ${EVENT_DETAILS.dinnerStart} - ${EVENT_DETAILS.dinnerEnd}</p>` : ''}
+                    <p><strong>Dinner Seating Time:</strong> ${data.dinnerTime}</p>
+                    <p><strong>Dinner Service:</strong> ${EVENT_DETAILS.dinnerStart} - ${EVENT_DETAILS.dinnerEnd}</p>
                     <p><strong>Social Event:</strong> ${EVENT_DETAILS.socialStart} - ${EVENT_DETAILS.socialEnd}</p>
                     <p><strong>Location:</strong> ${EVENT_DETAILS.location}</p>
                     <p><strong>Number of Guests:</strong> ${data.guests}</p>
@@ -249,9 +235,9 @@ async function sendConfirmationEmail(data) {
                     ${data.notes ? `<p><strong>Special Requests:</strong> ${data.notes}</p>` : ''}
                 </div>
                 
-                ${isDinner ? `<div style="background: #fff4e6; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <div style="background: #fff4e6; padding: 15px; border-radius: 8px; margin: 20px 0;">
                     <p style="margin: 0;"><strong>Important:</strong> Please arrive 5-10 minutes before your seating time. Your table will be held for 15 minutes past your reservation time.</p>
-                </div>` : ''}
+                </div>
                 
                 <p>We look forward to hosting you for this special evening!</p>
                 <p>If you have any questions or need to modify your reservation, please don't hesitate to contact us.</p>
@@ -281,20 +267,13 @@ function showSuccess(data) {
     form.style.display = 'none';
     successMessage.style.display = 'block';
     
-    const isDinner = data.eventType === 'dinner-social';
-    const eventTypeName = isDinner ? 'Dinner + Social' : 'Social Only';
+    const eventTypeName = 'Dinner + Social';
     
     // Display reservation details
     let detailsHTML = `
-        <p><strong>Date:</strong> Wednesday, December 17th, 2025</p>
+        <p><strong>Date:</strong> Wednesday, ${EVENT_DETAILS.date}</p>
         <p><strong>Reservation Type:</strong> ${eventTypeName}</p>
-    `;
-    
-    if (isDinner && data.dinnerTime !== 'N/A') {
-        detailsHTML += `<p><strong>Dinner Seating:</strong> ${data.dinnerTime}</p>`;
-    }
-    
-    detailsHTML += `
+        <p><strong>Dinner Seating:</strong> ${data.dinnerTime}</p>
         <p><strong>Number of Guests:</strong> ${data.guests}</p>
         <p><strong>Location:</strong> Lobby Hamilton, Hamilton, ON</p>
     `;
@@ -305,31 +284,26 @@ function showSuccess(data) {
     successMessage.dataset.dinnerTime = data.dinnerTime;
     successMessage.dataset.guestName = data.name;
     successMessage.dataset.guests = data.guests;
-    successMessage.dataset.eventType = data.eventType;
 }
 
 // Calendar button handlers
 addToAppleBtn.addEventListener('click', () => {
     const dinnerTime = successMessage.dataset.dinnerTime;
-    const eventType = successMessage.dataset.eventType;
-    downloadICSFile(dinnerTime, eventType);
+    downloadICSFile(dinnerTime);
 });
 
 addToGoogleBtn.addEventListener('click', () => {
     const dinnerTime = successMessage.dataset.dinnerTime;
-    const eventType = successMessage.dataset.eventType;
-    openGoogleCalendar(dinnerTime, eventType);
+    openGoogleCalendar(dinnerTime);
 });
 
 // Generate ICS file for Apple Calendar
-function downloadICSFile(dinnerTime, eventType) {
-    const isDinner = eventType === 'dinner-social';
-    
+function downloadICSFile(dinnerTime) {
     // Convert dinner time to 24-hour format for ICS
-    let startHour = '20'; // Default 8 PM (social only)
+    let startHour = '18'; // Default 6 PM for dinner
     let startMin = '00';
     
-    if (isDinner && dinnerTime !== 'N/A') {
+    if (dinnerTime && dinnerTime !== 'N/A') {
         if (dinnerTime === '6:15 PM') {
             startHour = '18';
             startMin = '15';
@@ -350,7 +324,7 @@ function downloadICSFile(dinnerTime, eventType) {
     
     const startDate = `${eventDateStr}T${startHour}${startMin}00`;
     const endDate = `${nextDayStr}T000000`; // Until midnight
-    const eventTitle = isDinner ? `Ladies Night - Dinner + Social` : `Ladies Night - Social`;
+    const eventTitle = `Ladies Night - Dinner + Social`;
     
     const icsContent = `BEGIN:VCALENDAR
 VERSION:2.0
@@ -361,13 +335,13 @@ DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z
 DTSTART:${startDate}
 DTEND:${endDate}
 SUMMARY:${eventTitle}
-DESCRIPTION:${isDinner ? `Dinner reservation at ${dinnerTime} followed by Ladies Night celebration.` : 'Ladies Night celebration starting at 8:00 PM.'} ${EVENT_DETAILS.description}
+DESCRIPTION:Dinner reservation at ${dinnerTime} followed by Ladies Night celebration. ${EVENT_DETAILS.description}
 LOCATION:${EVENT_DETAILS.location}
 STATUS:CONFIRMED
 BEGIN:VALARM
 TRIGGER:-PT2H
 ACTION:DISPLAY
-DESCRIPTION:Reminder: Ladies Night ${isDinner ? 'dinner reservation' : 'event'} in 2 hours
+DESCRIPTION:Reminder: Ladies Night dinner reservation in 2 hours
 END:VALARM
 END:VEVENT
 END:VCALENDAR`;
@@ -382,13 +356,11 @@ END:VCALENDAR`;
 }
 
 // Open Google Calendar
-function openGoogleCalendar(dinnerTime, eventType) {
-    const isDinner = eventType === 'dinner-social';
-    
+function openGoogleCalendar(dinnerTime) {
     // Convert dinner time to format Google Calendar expects
-    let startTime = '200000'; // Default 8 PM (social only)
+    let startTime = '180000'; // Default 6 PM for dinner
     
-    if (isDinner && dinnerTime !== 'N/A') {
+    if (dinnerTime && dinnerTime !== 'N/A') {
         if (dinnerTime === '6:15 PM') startTime = '181500';
         else if (dinnerTime === '6:30 PM') startTime = '183000';
         else startTime = '180000';
@@ -403,10 +375,8 @@ function openGoogleCalendar(dinnerTime, eventType) {
     const startDate = `${eventDateStr}T${startTime}`;
     const endDate = `${nextDayStr}T000000`;
     
-    const eventTitle = isDinner ? `Ladies Night - Dinner at ${dinnerTime}` : `Ladies Night at Lobby Hamilton`;
-    const eventDescription = isDinner 
-        ? `Dinner reservation at ${dinnerTime} followed by the Ladies Night celebration. ${EVENT_DETAILS.description}`
-        : `Ladies Night celebration starting at 8:00 PM. ${EVENT_DETAILS.description}`;
+    const eventTitle = `Ladies Night - Dinner at ${dinnerTime}`;
+    const eventDescription = `Dinner reservation at ${dinnerTime} followed by the Ladies Night celebration. ${EVENT_DETAILS.description}`;
     
     const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${startDate}/${endDate}&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(EVENT_DETAILS.location)}`;
     

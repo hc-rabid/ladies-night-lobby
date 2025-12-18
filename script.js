@@ -4,15 +4,48 @@ const CONFIG = {
     EMAIL_SERVICE_URL: 'https://script.google.com/macros/s/AKfycbxdz_zh7e57sZ0sMayu1YSRzEllMSrmpA7eKwme5N0S1PZXn41_6hJWsgmiMx3KdGYb/exec' // Can use same Google Apps Script or separate service
 };
 
+// Helper function to get next Wednesday
+function getNextWednesday() {
+    const today = new Date();
+    const day = today.getDay();
+    // Calculate days until next Wednesday (3 = Wednesday)
+    const daysUntilWednesday = (3 - day + 7) % 7 || 7;
+    const nextWed = new Date(today);
+    nextWed.setDate(today.getDate() + daysUntilWednesday);
+    return nextWed;
+}
+
+// Helper function to format event date
+function formatEventDate(date) {
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+}
+
+// Helper function to get calendar date string (YYYYMMDD format)
+function getCalendarDateString(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}${month}${day}`;
+}
+
 // Event Details
 const EVENT_DETAILS = {
-    name: 'Ladies Night Launch - Late Night Mingle',
-    date: 'December 10, 2025',
+    name: 'Ladies Night - Social Evening',
+    date: formatEventDate(getNextWednesday()),
     startTime: '8:00 PM',
     endTime: '12:00 AM',
     location: 'Lobby Hamilton, Hamilton, ON',
-    description: 'Join us for an exclusive late night mingle and networking event to celebrate the launch of Ladies Night at Lobby Hamilton.'
+    description: 'Join us every Wednesday for an unforgettable evening at Lobby Hamilton. Enjoy $10 cocktails all night, 50% off rosé, live entertainment, and more!'
 };
+
+// Update event date on page load
+document.addEventListener('DOMContentLoaded', () => {
+    const eventDateElement = document.getElementById('eventDate');
+    if (eventDateElement) {
+        eventDateElement.textContent = formatEventDate(getNextWednesday());
+    }
+});
 
 // DOM Elements
 const form = document.getElementById('rsvpForm');
@@ -195,8 +228,10 @@ addToGoogleBtn.addEventListener('click', () => {
 
 // Generate ICS file for Apple Calendar
 function downloadICSFile() {
-    const startDate = '20251210T200000'; // December 10, 2025, 8:00 PM
-    const endDate = '20251211T000000';   // December 11, 2025, 12:00 AM
+    const eventDate = getNextWednesday();
+    const dateStr = getCalendarDateString(eventDate);
+    const startDate = `${dateStr}T200000`; // 8:00 PM
+    const endDate = `${dateStr}T235900`;   // 11:59 PM (same day)
     
     const icsContent = `BEGIN:VCALENDAR
 VERSION:2.0
@@ -206,7 +241,7 @@ UID:${Date.now()}@lobbyhamilton.com
 DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z
 DTSTART:${startDate}
 DTEND:${endDate}
-SUMMARY:Ladies Night Launch - Late Night Mingle
+SUMMARY:Ladies Night - Social Evening
 DESCRIPTION:${EVENT_DETAILS.description}
 LOCATION:${EVENT_DETAILS.location}
 STATUS:CONFIRMED
@@ -229,8 +264,10 @@ END:VCALENDAR`;
 
 // Open Google Calendar
 function openGoogleCalendar() {
-    const startDate = '20251210T200000';
-    const endDate = '20251211T000000';
+    const eventDate = getNextWednesday();
+    const dateStr = getCalendarDateString(eventDate);
+    const startDate = `${dateStr}T200000`;
+    const endDate = `${dateStr}T235900`;
     
     const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(EVENT_DETAILS.name)}&dates=${startDate}/${endDate}&details=${encodeURIComponent(EVENT_DETAILS.description)}&location=${encodeURIComponent(EVENT_DETAILS.location)}`;
     
