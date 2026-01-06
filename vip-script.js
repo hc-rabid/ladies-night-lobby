@@ -206,6 +206,9 @@ async function submitToGoogleSheets(data) {
 // Send confirmation email
 async function sendConfirmationEmail(data) {
     const eventTypeName = 'Dinner + Social';
+    // Calculate next Wednesday dynamically when sending email
+    const nextWed = getNextWednesday();
+    const eventDate = getFormattedDateString(nextWed);
     
     const emailData = {
         to: data.email,
@@ -224,7 +227,7 @@ async function sendConfirmationEmail(data) {
                 <div style="background: #f8f8f8; padding: 20px; margin: 20px 0; border-left: 4px solid #d4af37;">
                     <h3 style="margin-top: 0; color: #1a1a1a;">Your Reservation Details</h3>
                     <p><strong>Event:</strong> ${EVENT_DETAILS.name}</p>
-                    <p><strong>Date:</strong> Wednesday, ${EVENT_DETAILS.date}</p>
+                    <p><strong>Date:</strong> Wednesday, ${eventDate}</p>
                     <p><strong>Reservation Type:</strong> ${eventTypeName}</p>
                     <p><strong>Dinner Seating Time:</strong> ${data.dinnerTime}</p>
                     <p><strong>Dinner Service:</strong> ${EVENT_DETAILS.dinnerStart} - ${EVENT_DETAILS.dinnerEnd}</p>
