@@ -11,6 +11,35 @@
  * 5. Copy the Web App URL to your script.js and vip-script.js files
  */
 
+// Helper function to get next Wednesday
+function getNextWednesday() {
+  const today = new Date();
+  const day = today.getDay();
+  const daysUntilWednesday = (3 - day + 7) % 7 || 7; // 3 = Wednesday
+  const nextWed = new Date(today);
+  nextWed.setDate(today.getDate() + daysUntilWednesday);
+  return nextWed;
+}
+
+// Helper function to format date for emails
+function formatEventDate(date) {
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  
+  const dayName = days[date.getDay()];
+  const monthName = months[date.getMonth()];
+  const dayNum = date.getDate();
+  const year = date.getFullYear();
+  
+  // Add ordinal suffix (st, nd, rd, th)
+  let suffix = 'th';
+  if (dayNum === 1 || dayNum === 21 || dayNum === 31) suffix = 'st';
+  else if (dayNum === 2 || dayNum === 22) suffix = 'nd';
+  else if (dayNum === 3 || dayNum === 23) suffix = 'rd';
+  
+  return `${dayName}, ${monthName} ${dayNum}${suffix}, ${year}`;
+}
+
 // Handle POST requests (form submissions)
 function doPost(e) {
   try {
@@ -278,6 +307,10 @@ function sendConfirmationEmail(data, sheetType) {
   try {
     const isVIP = sheetType === 'VIPRSVPs';
     
+    // Calculate next Wednesday dynamically
+    const nextWednesday = getNextWednesday();
+    const eventDate = formatEventDate(nextWednesday);
+    
     let htmlBody;
     
     if (isVIP) {
@@ -290,15 +323,15 @@ function sendConfirmationEmail(data, sheetType) {
             <h2 style="margin: 0;">VIP RESERVATION CONFIRMED</h2>
           </div>
           <p>Dear ${data.name},</p>
-          <p>Thank you for confirming your attendance at our exclusive VIP Ladies Night Launch event. Your dinner reservation has been confirmed.</p>
+          <p>Thank you for confirming your attendance at Ladies Night this Wednesday! We're thrilled to have you as our VIP guest.</p>
           
           <div style="background: #f8f8f8; padding: 20px; margin: 20px 0; border-left: 4px solid #d4af37;">
             <h3 style="margin-top: 0; color: #1a1a1a;">Your Reservation Details</h3>
-            <p><strong>Event:</strong> Ladies Night Launch - VIP Dinner + Social</p>
-            <p><strong>Date:</strong> Wednesday, December 10th, 2025</p>
+            <p><strong>Event:</strong> Ladies Night at Lobby Hamilton - VIP Dinner + Social</p>
+            <p><strong>Date:</strong> ${eventDate}</p>
             <p><strong>Dinner Seating Time:</strong> ${data.dinnerTime}</p>
             <p><strong>Dinner Service:</strong> 6:00 PM - 8:00 PM</p>
-            <p><strong>Late Night Social:</strong> 8:00 PM - Late</p>
+            <p><strong>Social Event:</strong> 8:00 PM - Late</p>
             <p><strong>Location:</strong> Lobby Hamilton, Hamilton, ON</p>
             <p><strong>Number of Guests:</strong> ${data.guests}</p>
             <p><strong>Instagram:</strong> ${data.instagram}</p>
@@ -326,12 +359,12 @@ function sendConfirmationEmail(data, sheetType) {
           </h1>
           <h2 style="color: #d4af37;">Your RSVP is Confirmed!</h2>
           <p>Dear ${data.name},</p>
-          <p>Thank you for confirming your attendance at our exclusive Ladies Night Launch event.</p>
+          <p>Thank you for confirming your attendance at Ladies Night this Wednesday!</p>
           
           <div style="background: #f8f8f8; padding: 20px; margin: 20px 0; border-left: 4px solid #d4af37;">
             <h3 style="margin-top: 0; color: #1a1a1a;">Event Details</h3>
-            <p><strong>Event:</strong> Ladies Night Launch - Late Night Mingle</p>
-            <p><strong>Date:</strong> Wednesday, December 10th, 2025</p>
+            <p><strong>Event:</strong> Ladies Night at Lobby Hamilton - Social Evening</p>
+            <p><strong>Date:</strong> ${eventDate}</p>
             <p><strong>Time:</strong> 8:00 PM - Late</p>
             <p><strong>Location:</strong> Lobby Hamilton, Hamilton, ON</p>
             <p><strong>Number of Guests:</strong> ${data.guests}</p>

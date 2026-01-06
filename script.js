@@ -1,7 +1,7 @@
 // Configuration - Replace these with your actual values
 const CONFIG = {
-    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxdz_zh7e57sZ0sMayu1YSRzEllMSrmpA7eKwme5N0S1PZXn41_6hJWsgmiMx3KdGYb/exec',
-    EMAIL_SERVICE_URL: 'https://script.google.com/macros/s/AKfycbxdz_zh7e57sZ0sMayu1YSRzEllMSrmpA7eKwme5N0S1PZXn41_6hJWsgmiMx3KdGYb/exec' // Can use same Google Apps Script or separate service
+    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyFp2aqXRCLu6BMHryXDiJwb3zivBOFzOkgjI5cJYOueKhQbRKKnhBVqOaqWjbEX2Sg/exec',
+    EMAIL_SERVICE_URL: 'https://script.google.com/macros/s/AKfycbyFp2aqXRCLu6BMHryXDiJwb3zivBOFzOkgjI5cJYOueKhQbRKKnhBVqOaqWjbEX2Sg/exec' // Can use same Google Apps Script or separate service
 };
 
 // Helper function to get next Wednesday
