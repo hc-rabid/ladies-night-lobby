@@ -1,7 +1,7 @@
 // Configuration - Replace these with your actual values
 const CONFIG = {
-    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyFp2aqXRCLu6BMHryXDiJwb3zivBOFzOkgjI5cJYOueKhQbRKKnhBVqOaqWjbEX2Sg/exec',
-    EMAIL_SERVICE_URL: 'https://script.google.com/macros/s/AKfycbyFp2aqXRCLu6BMHryXDiJwb3zivBOFzOkgjI5cJYOueKhQbRKKnhBVqOaqWjbEX2Sg/exec' // Can use same Google Apps Script or separate service
+    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxFHgM_gHXWMeh_8ActKl7cMI36fYuYiY-ur-86RL2DAv1aEV6aCL9PINNsPKQTXNZ_/exec',
+    EMAIL_SERVICE_URL: 'https://script.google.com/macros/s/AKfycbxFHgM_gHXWMeh_8ActKl7cMI36fYuYiY-ur-86RL2DAv1aEV6aCL9PINNsPKQTXNZ_/exec' // Can use same Google Apps Script or separate service
 };
 
 // Helper function to get next Wednesday
@@ -47,6 +47,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+// Guest management
+let guests = [];
+const MAX_GUESTS = 5;
+
 // DOM Elements
 const form = document.getElementById('rsvpForm');
 const submitBtn = document.getElementById('submitBtn');
@@ -55,10 +59,103 @@ const btnLoader = submitBtn.querySelector('.btn-loader');
 const successMessage = document.getElementById('successMessage');
 const addToAppleBtn = document.getElementById('addToApple');
 const addToGoogleBtn = document.getElementById('addToGoogle');
+const addGuestBtn = document.getElementById('addGuestBtn');
+const guestsList = document.getElementById('guestsList');
+const guestCount = document.getElementById('guestCount');
+
+// Add Guest Button Handler
+addGuestBtn.addEventListener('click', () => {
+    if (guests.length < MAX_GUESTS) {
+        addGuest();
+    }
+});
+
+// Add a new guest
+function addGuest() {
+    const guestId = Date.now();
+    guests.push({
+        id: guestId,
+        name: '',
+        email: '',
+        phone: '',
+        instagram: ''
+    });
+    
+    renderGuests();
+    updateGuestCount();
+}
+
+// Remove a guest
+function removeGuest(guestId) {
+    guests = guests.filter(g => g.id !== guestId);
+    renderGuests();
+    updateGuestCount();
+}
+
+// Update guest count display
+function updateGuestCount() {
+    guestCount.textContent = `(${guests.length}/${MAX_GUESTS})`;
+    addGuestBtn.disabled = guests.length >= MAX_GUESTS;
+}
+
+// Render all guests
+function renderGuests() {
+    guestsList.innerHTML = '';
+    
+    guests.forEach((guest, index) => {
+        const guestCard = document.createElement('div');
+        guestCard.className = 'guest-card';
+        guestCard.innerHTML = `
+            <div class="guest-card-header">
+                <span class="guest-card-title">Guest ${index + 1}</span>
+                <button type="button" class="remove-guest-btn" onclick="removeGuest(${guest.id})">Remove</button>
+            </div>
+            <div class="form-group">
+                <label>Full Name *</label>
+                <input type="text" class="guest-input" data-guest-id="${guest.id}" data-field="name" value="${guest.name}" required>
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" class="guest-input" data-guest-id="${guest.id}" data-field="email" value="${guest.email}" placeholder="optional">
+            </div>
+            <div class="form-group">
+                <label>Phone</label>
+                <input type="tel" class="guest-input" data-guest-id="${guest.id}" data-field="phone" value="${guest.phone}" placeholder="optional">
+            </div>
+            <div class="form-group">
+                <label>Instagram</label>
+                <input type="text" class="guest-input" data-guest-id="${guest.id}" data-field="instagram" value="${guest.instagram}" placeholder="@username (optional)">
+            </div>
+        `;
+        guestsList.appendChild(guestCard);
+    });
+    
+    // Add event listeners to guest inputs
+    document.querySelectorAll('.guest-input').forEach(input => {
+        input.addEventListener('input', (e) => {
+            const guestId = parseInt(e.target.dataset.guestId);
+            const field = e.target.dataset.field;
+            const guest = guests.find(g => g.id === guestId);
+            if (guest) {
+                guest[field] = e.target.value;
+            }
+        });
+    });
+}
+
+// Make removeGuest available globally
+window.removeGuest = removeGuest;
 
 // Form submission handler
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    
+    // Validate all guest names are filled
+    const emptyGuestNames = guests.some(g => !g.name.trim());
+    if (emptyGuestNames) {
+        showError('Please fill in all guest names or remove empty guests');
+        return;
+    }
     
     // Get form data
     const formData = {
@@ -66,7 +163,8 @@ form.addEventListener('submit', async (e) => {
         email: document.getElementById('email').value.trim(),
         phone: document.getElementById('phone').value.trim(),
         instagram: document.getElementById('instagram').value.trim(),
-        guests: document.getElementById('guests').value,
+        totalGuests: guests.length + 1, // Including main guest
+        guests: guests,
         eventType: 'Late Night Mingle',
         timestamp: new Date().toISOString()
     };

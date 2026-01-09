@@ -53,6 +53,18 @@ function doPost(e) {
         return createResponse('error', 'Sheet not found: ' + data.sheet);
       }
       
+      // Format guests info as a string
+      let guestsInfo = '';
+      if (data.data.guests && data.data.guests.length > 0) {
+        guestsInfo = data.data.guests.map((g, i) => {
+          let info = `Guest ${i + 1}: ${g.name}`;
+          if (g.email) info += ` (${g.email})`;
+          if (g.phone) info += ` | ${g.phone}`;
+          if (g.instagram) info += ` | ${g.instagram}`;
+          return info;
+        }).join('; ');
+      }
+      
       // Prepare row data based on sheet type
       let row;
       if (data.sheet === 'VIPRSVPs') {
@@ -62,7 +74,8 @@ function doPost(e) {
           data.data.email,
           data.data.phone,
           data.data.instagram || 'N/A',
-          data.data.guests,
+          data.data.totalGuests || 1,
+          guestsInfo || 'No additional guests',
           data.data.dinnerTime || 'N/A',
           data.data.notes || '',
           data.data.eventType
@@ -70,7 +83,7 @@ function doPost(e) {
         
         // Update capacity for VIP reservations
         if (data.data.dinnerTime) {
-          updateCapacity(data.data.dinnerTime, parseInt(data.data.guests));
+          updateCapacity(data.data.dinnerTime, parseInt(data.data.totalGuests || 1));
         }
       } else {
         row = [
@@ -79,7 +92,8 @@ function doPost(e) {
           data.data.email,
           data.data.phone,
           data.data.instagram || 'N/A',
-          data.data.guests,
+          data.data.totalGuests || 1,
+          guestsInfo || 'No additional guests',
           data.data.eventType
         ];
       }
@@ -311,6 +325,24 @@ function sendConfirmationEmail(data, sheetType) {
     const nextWednesday = getNextWednesday();
     const eventDate = formatEventDate(nextWednesday);
     
+    // Format guest list for email
+    let guestListHTML = '';
+    if (data.guests && data.guests.length > 0) {
+      guestListHTML = '<p><strong>Additional Guests:</strong></p><ul style="margin-top: 5px;">';
+      data.guests.forEach((guest, index) => {
+        guestListHTML += `<li>${guest.name}`;
+        if (guest.email || guest.phone) {
+          guestListHTML += ' (';
+          if (guest.email) guestListHTML += guest.email;
+          if (guest.email && guest.phone) guestListHTML += ', ';
+          if (guest.phone) guestListHTML += guest.phone;
+          guestListHTML += ')';
+        }
+        guestListHTML += '</li>';
+      });
+      guestListHTML += '</ul>';
+    }
+    
     let htmlBody;
     
     if (isVIP) {
@@ -333,7 +365,8 @@ function sendConfirmationEmail(data, sheetType) {
             <p><strong>Dinner Service:</strong> 6:00 PM - 8:00 PM</p>
             <p><strong>Social Event:</strong> 8:00 PM - Late</p>
             <p><strong>Location:</strong> Lobby Hamilton, Hamilton, ON</p>
-            <p><strong>Number of Guests:</strong> ${data.guests}</p>
+            <p><strong>Total Party Size:</strong> ${data.totalGuests || 1} ${(data.totalGuests || 1) === 1 ? 'person' : 'people'}</p>
+            ${guestListHTML}
             <p><strong>Instagram:</strong> ${data.instagram}</p>
             ${data.notes ? `<p><strong>Special Requests:</strong> ${data.notes}</p>` : ''}
           </div>
@@ -367,7 +400,8 @@ function sendConfirmationEmail(data, sheetType) {
             <p><strong>Date:</strong> ${eventDate}</p>
             <p><strong>Time:</strong> 8:00 PM - Late</p>
             <p><strong>Location:</strong> Lobby Hamilton, Hamilton, ON</p>
-            <p><strong>Number of Guests:</strong> ${data.guests}</p>
+            <p><strong>Total Party Size:</strong> ${data.totalGuests || 1} ${(data.totalGuests || 1) === 1 ? 'person' : 'people'}</p>
+            ${guestListHTML}
             <p><strong>Instagram:</strong> ${data.instagram}</p>
           </div>
           
