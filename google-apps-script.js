@@ -253,7 +253,11 @@ function updateCapacity(timeSlot, guestCount) {
       const timeSlots = [
         ['6:00 PM', 0],
         ['6:15 PM', 0],
-        ['6:30 PM', 0]
+        ['6:30 PM', 0],
+        ['6:45 PM', 0],
+        ['7:00 PM', 0],
+        ['7:15 PM', 0],
+        ['7:30 PM', 0]
       ];
       
       timeSlots.forEach((slot, index) => {
