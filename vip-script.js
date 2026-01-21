@@ -1,14 +1,15 @@
 // Configuration - Replace these with your actual values
 const CONFIG = {
-    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxFHgM_gHXWMeh_8ActKl7cMI36fYuYiY-ur-86RL2DAv1aEV6aCL9PINNsPKQTXNZ_/exec',
-    EMAIL_SERVICE_URL: 'https://script.google.com/macros/s/AKfycbxFHgM_gHXWMeh_8ActKl7cMI36fYuYiY-ur-86RL2DAv1aEV6aCL9PINNsPKQTXNZ_/exec' // Can use same Google Apps Script or separate service
+    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwTmfAimFLPvvMaBl4ExfQlpraqjbxiBrXpT14T7Dn8ylw4V0XeKKTRfvRmkZVQlnSa/exec',
+    EMAIL_SERVICE_URL: 'https://script.google.com/macros/s/AKfycbwTmfAimFLPvvMaBl4ExfQlpraqjbxiBrXpT14T7Dn8ylw4V0XeKKTRfvRmkZVQlnSa/exec' // Can use same Google Apps Script or separate service
 };
 
 // Get next Wednesday from today
 function getNextWednesday() {
     const today = new Date();
     const day = today.getDay();
-    const daysUntilWednesday = (3 - day + 7) % 7 || 7; // 3 = Wednesday
+    // If today is Wednesday (3), return today (0 days). Otherwise, calculate days until next Wednesday.
+    const daysUntilWednesday = (3 - day + 7) % 7; // 3 = Wednesday
     const nextWed = new Date(today);
     nextWed.setDate(today.getDate() + daysUntilWednesday);
     return nextWed;

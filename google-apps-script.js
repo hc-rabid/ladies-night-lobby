@@ -15,7 +15,8 @@
 function getNextWednesday() {
   const today = new Date();
   const day = today.getDay();
-  const daysUntilWednesday = (3 - day + 7) % 7 || 7; // 3 = Wednesday
+  // If today is Wednesday (3), return today (0 days). Otherwise, calculate days until next Wednesday.
+  const daysUntilWednesday = (3 - day + 7) % 7; // 3 = Wednesday
   const nextWed = new Date(today);
   nextWed.setDate(today.getDate() + daysUntilWednesday);
   return nextWed;
@@ -65,6 +66,10 @@ function doPost(e) {
         }).join('; ');
       }
       
+      // Calculate event date for this RSVP
+      const eventWednesday = getNextWednesday();
+      const eventDateForRSVP = formatEventDate(eventWednesday);
+      
       // Prepare row data based on sheet type
       let row;
       if (data.sheet === 'VIPRSVPs') {
@@ -78,7 +83,8 @@ function doPost(e) {
           guestsInfo || 'No additional guests',
           data.data.dinnerTime || 'N/A',
           data.data.notes || '',
-          data.data.eventType
+          data.data.eventType,
+          eventDateForRSVP
         ];
         
         // Update capacity for VIP reservations
@@ -94,7 +100,8 @@ function doPost(e) {
           data.data.instagram || 'N/A',
           data.data.totalGuests || 1,
           guestsInfo || 'No additional guests',
-          data.data.eventType
+          data.data.eventType,
+          eventDateForRSVP
         ];
       }
       

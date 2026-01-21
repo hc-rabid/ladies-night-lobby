@@ -1,6 +1,6 @@
 // Configuration - Replace with your Google Apps Script URL
 const CONFIG = {
-    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxFHgM_gHXWMeh_8ActKl7cMI36fYuYiY-ur-86RL2DAv1aEV6aCL9PINNsPKQTXNZ_/exec'
+    GOOGLE_APPS_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwTmfAimFLPvvMaBl4ExfQlpraqjbxiBrXpT14T7Dn8ylw4V0XeKKTRfvRmkZVQlnSa/exec'
 };
 
 // State
