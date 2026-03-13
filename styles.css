@@ -192,7 +192,8 @@ h1, h2, h3 {
 .inclusions {
     margin-top: 50px;
     padding-top: 40px;
-    border-top: 1px solid var(--border-color);
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .inclusions h4 {
