@@ -107,21 +107,6 @@ h1, h2, h3 {
     font-style: normal;
 }
 
-.vip-badge {
-    background: linear-gradient(135deg, #d4af37, #f4d03f);
-    color: #2c2c2c;
-    padding: 12px 30px;
-    border-radius: 50px;
-    display: inline-block;
-    font-style: normal;
-    font-weight: 600;
-    margin-bottom: 40px;
-    font-size: 0.95rem;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
-}
-
 .social-badge {
     background: #2c2c2c;
     color: white;
@@ -281,34 +266,6 @@ h1, h2, h3 {
     letter-spacing: 2px;
     text-transform: uppercase;
     box-shadow: 0 3px 10px rgba(212, 175, 55, 0.4);
-}
-
-/* VIP Exclusive Items */
-.vip-exclusive {
-    position: relative;
-    background: linear-gradient(135deg, #fffbf5, #fff8ed);
-    border: 2px solid #d4af37;
-    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
-}
-
-.vip-exclusive:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
-}
-
-.vip-tag {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background: linear-gradient(135deg, #d4af37, #f4d03f);
-    color: #2c2c2c;
-    font-size: 0.65rem;
-    font-weight: 700;
-    padding: 3px 8px;
-    border-radius: 12px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
 }
 
 /* RSVP Section */
