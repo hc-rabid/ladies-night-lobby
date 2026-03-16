@@ -122,6 +122,22 @@ h1, h2, h3 {
     box-shadow: 0 4px 15px rgba(44, 44, 44, 0.3);
 }
 
+.vip-badge {
+    background: linear-gradient(135deg, #D4AF37 0%, #F2D974 50%, #D4AF37 100%);
+    color: #1a1a1a;
+    padding: 12px 30px;
+    border-radius: 50px;
+    display: inline-block;
+    font-style: normal;
+    font-weight: 700;
+    margin-bottom: 40px;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+    border: 2px solid #F2D974;
+}
+
 /* Event Info */
 .event-info {
     display: grid;
